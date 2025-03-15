@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<script src="~/js/swiper.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+<div id="swiper">
+
+    <div class="recommendation">
+        <div class="profile-card" style="--i:1">
+            <div class="profile-image">
+                <img src="https://d2779tscntxxsw.cloudfront.net/5a72451098031.png?width=1200&quality=80" alt="Profile Picture">
+            </div>
+            <div class="profile-bio">
+                <h2>Christiyan Yankov</h2>
+                <p>83 Kg &nbsp;&nbsp; 195 Cm</p>
+                <div class="tags">
+                    <button class="tag">MMA</button>
+                    <button class="tag">Boxing</button>
+                    <button class="tag">BJJ</button>
+                    <button class="tag more">more</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="additional-info">
+            <p><strong>Location:</strong> 5km away</p>
+            <p><strong>Trained for:</strong> 7 years</p>
+            <p><strong>Languages:</strong> English, Spanish</p>
+        </div>
+    </div>
+
+    <div class="recommendation">
+        <div class="profile-card" style="--i:2">
+            <div class="profile-image">
+                <img src="https://scontent-ams4-1.xx.fbcdn.net/v/t39.30808-6/448831360_467520422633143_6512706091174334758_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=yT7GvBdfHcQQ7kNvgE1U7Yk&_nc_zt=23&_nc_ht=scontent-ams4-1.xx&_nc_gid=AFewaFFd12hMIurnZ15wQ5L&oh=00_AYCmnKRNyqwgueog8LP-AdHwOl0QLlw5dSdnnJKICYtB3w&oe=67B364D9" alt="Profile Picture">
+            </div>
+            <div class="profile-bio">
+                <h2>Christiyan Yankov</h2>
+                <p>83 Kg &nbsp;&nbsp; 195 Cm</p>
+                <div class="tags">
+                    <button class="tag">MMA</button>
+                    <button class="tag">Boxing</button>
+                    <button class="tag">BJJ</button>
+                    <button class="tag more">more</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="additional-info">
+            <p><strong>Location:</strong> 5km away</p>
+            <p><strong>Trained for:</strong> 7 years</p>
+            <p><strong>Languages:</strong> English, Spanish</p>
+        </div>
+    </div>
+
+    <div class="recommendation">
+        <div class="profile-card" style="--i:3">
+            <div class="profile-image">
+                <img src="https://phantom-marca.unidadeditorial.es/2cf4dd89576cf80075d119bc77c966ed/resize/1200/f/webp/assets/multimedia/imagenes/2024/06/30/17197425533727.png" alt="Profile Picture">
+            </div>
+            <div class="profile-bio">
+                <h2>Christiyan Yankov</h2>
+                <p>83 Kg &nbsp;&nbsp; 195 Cm</p>
+                <div class="tags">
+                    <button class="tag">MMA</button>
+                    <button class="tag">Boxing</button>
+                    <button class="tag">BJJ</button>
+                    <button class="tag more">more</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="additional-info">
+            <p><strong>Location:</strong> 5km away</p>
+            <p><strong>Trained for:</strong> 7 years</p>
+            <p><strong>Languages:</strong> English, Spanish</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("Swiped");
+
+        const recommendations = document.querySelectorAll(".recommendation");
+        let currentIndex = recommendations.length - 1;
+
+        function setupSwipe(recommendation) {
+            const profileCard = recommendation.querySelector(".profile-card");
+            const hammer = new Hammer(profileCard);
+
+            hammer.on("pan", function (event) {
+                recommendation.style.transform = `translateX(${event.deltaX}px) rotate(${event.deltaX / 10}deg)`;
+            });
+
+            hammer.on("panend", function (event) {
+                if (event.deltaX > 200) {
+                    recommendation.style.transform = "translateX(100vw) rotate(20deg)";
+                    removeRecommendation(recommendation);
+                } else if (event.deltaX < -200) {
+                    recommendation.style.transform = "translateX(-100vw) rotate(-20deg)";
+                    removeRecommendation(recommendation);
+                } else {
+                    recommendation.style.transform = "";
+                }
+            });
+        }
+
+        function removeRecommendation(recommendation) {
+            setTimeout(() => {
+                recommendation.remove();
+                currentIndex--;
+                if (currentIndex >= 0) {
+                    setupSwipe(recommendations[currentIndex]);
+                }
+            }, 300);
+        }
+
+        if (recommendations.length > 0) {
+            setupSwipe(recommendations[currentIndex]);
+        }
+    });
+
+</script>
+
