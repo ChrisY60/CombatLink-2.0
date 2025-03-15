@@ -1,10 +1,15 @@
 ﻿using CombatLink.Services.IServices;
 using CombatLink.ViewModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace CombatLink.Controllers
 {
+    [Authorize]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
@@ -18,11 +23,12 @@ namespace CombatLink.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
         }
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -36,18 +42,20 @@ namespace CombatLink.Controllers
 
             if (isRegistered)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("LogIn", "User");
             }else
             {
                 return View();
             }
 
         }
+        [AllowAnonymous]
         public IActionResult LogIn()
         {
             return View();
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> LogIn(LogInViewModel model)
         {
@@ -59,15 +67,26 @@ namespace CombatLink.Controllers
             int? id = (int)await _userService.LogInUserAsync(model.Email, passwordHash);
             if (id != null)
             {
-                CookieOptions cookieOptions = new CookieOptions
+                var claims = new List<Claim>
                 {
-                    Expires = DateTime.Now.AddHours(1),
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
+                    new Claim(ClaimTypes.Name, model.Email),
+                    new Claim(ClaimTypes.NameIdentifier, id.ToString()),
+                    new Claim(ClaimTypes.Role, "User")
                 };
 
-                Response.Cookies.Append("UserId", id.ToString(), cookieOptions);
+                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                AuthenticationProperties authenticationProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTime.UtcNow.AddHours(1)
+                };
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity),
+                    authenticationProperties
+                );
+
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -77,8 +96,9 @@ namespace CombatLink.Controllers
             }
 
         }
-        public IActionResult LogOut()
+        public async Task<IActionResult> LogOut()
         {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
 
