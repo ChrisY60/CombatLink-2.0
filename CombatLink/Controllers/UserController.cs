@@ -1,9 +1,11 @@
 ﻿using CombatLink.Services.IServices;
 using CombatLink.ViewModels;
+using CombatLinkMVC.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Reflection;
 using System.Security.Claims;
 
@@ -102,5 +104,60 @@ namespace CombatLink.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-    }   
+        public async Task<IActionResult> ManageProfile()
+        {
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = await _userService.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound("User profile not found.");
+            }
+            Debug.WriteLine(user.FirstName);
+            UserProfileViewModel model = new UserProfileViewModel
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DateOfBirth = user.DateOfBirth,
+                Weight = user.Weight,
+                Height = user.Height,
+                MonthsOfExperience = user.MonthsOfExperience
+            };
+
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ManageProfile(UpdateUserProfileManagementViewModel model)
+        {
+            Debug.WriteLine("Got here 1");
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            bool isUpdated = await _userService.UpdateUserProfile(
+                userId,
+                model.FirstName,
+                model.LastName,
+                model.DateOfBirth,
+                model.Weight,
+                model.Height,
+                model.MonthsOfExperience
+            );
+
+            if (isUpdated)
+            {
+                ViewBag.Message = "Profile updated successfully!";
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ModelState.AddModelError("", "Failed to update profile.");
+                return View(model);
+            }
+        }
+    }
 }

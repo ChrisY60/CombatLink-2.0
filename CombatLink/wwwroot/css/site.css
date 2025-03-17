@@ -51,10 +51,11 @@ body {
     height: 90vh;
     min-width: 350px;
     display: flex;
+    flex-direction: column;
     margin: auto;
-    justify-content: center;
     align-items: center;
     border-radius: 25px;
+    gap: 10px;
 }
 
 .mainButton {

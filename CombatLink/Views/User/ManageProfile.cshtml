@@ -1,0 +1,43 @@
+﻿@model CombatLink.ViewModels.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile Management";
+}
+<div class="mainBox">
+    <h2>Profile Management</h2>
+
+    <form asp-action="ManageProfile" method="post" class="profile-form">
+        <div class="form-group">
+            <label asp-for="FirstName">First Name</label>
+            <input asp-for="FirstName" class="form-control" placeholder="Enter your first name" required />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="LastName">Last Name</label>
+            <input asp-for="LastName" class="form-control" placeholder="Enter your last name" required />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DateOfBirth">Date of Birth</label>
+            <input asp-for="DateOfBirth" type="date" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Weight">Weight (kg)</label>
+            <input asp-for="Weight" type="number" step="0.1" class="form-control" placeholder="Enter your weight" required />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Height">Height (cm)</label>
+            <input asp-for="Height" type="number" class="form-control" placeholder="Enter your height" required />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="MonthsOfExperience">Months of Experience</label>
+            <input asp-for="MonthsOfExperience" type="number" class="form-control" placeholder="Enter months of experience" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
+</div>
+    

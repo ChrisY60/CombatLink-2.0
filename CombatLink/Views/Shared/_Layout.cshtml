@@ -34,7 +34,7 @@
                                 <a class="nav-link" asp-controller="User" asp-action="LogOut">Logout</a>
                             </li>
                             <li class="nav-item">
-                                <span class="nav-link">@User.Identity.Name</span>
+                                <a class="nav-link" asp-controller="User" asp-action="ManageProfile">@User.Identity.Name</a>
                             </li>
                         }else{
                             <li class="nav-item">
