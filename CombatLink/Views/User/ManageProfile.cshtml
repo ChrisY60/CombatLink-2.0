@@ -3,41 +3,63 @@
 @{
     ViewData["Title"] = "Profile Management";
 }
-<div class="mainBox">
-    <h2>Profile Management</h2>
 
-    <form asp-action="ManageProfile" method="post" class="profile-form">
-        <div class="form-group">
-            <label asp-for="FirstName">First Name</label>
-            <input asp-for="FirstName" class="form-control" placeholder="Enter your first name" required />
+<div class="container mt-4 secondary-background">
+    <h2 class="text-center">Profile Management</h2>
+
+    <div class="row">
+        <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <div class="profile-card" style="--i:1">
+                <div class="profile-image">
+                    <img src="https://d2779tscntxxsw.cloudfront.net/5a72451098031.png?width=1200&quality=80" alt="Profile Picture">
+                </div>
+                <div class="profile-bio">
+                    <h2>@Model.FirstName @Model.LastName</h2>
+                    <p>@Model.Weight Kg &nbsp;&nbsp; @Model.Height Cm</p>
+                    <div class="tags">
+                        <button class="tag">MMA</button>
+                        <button class="tag">Boxing</button>
+                        <button class="tag">BJJ</button>
+                        <button class="tag more">more</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label asp-for="LastName">Last Name</label>
-            <input asp-for="LastName" class="form-control" placeholder="Enter your last name" required />
-        </div>
+        <div class="col-md-6">
+            <form asp-action="ManageProfile" method="post" class="profile-form">
+                <div class="form-group">
+                    <label asp-for="FirstName">First Name</label>
+                    <input asp-for="FirstName" class="form-control" placeholder="Enter your first name" required oninput="updatePreview()" id="inputFirstName" />
+                </div>
 
-        <div class="form-group">
-            <label asp-for="DateOfBirth">Date of Birth</label>
-            <input asp-for="DateOfBirth" type="date" class="form-control" required />
-        </div>
+                <div class="form-group">
+                    <label asp-for="LastName">Last Name</label>
+                    <input asp-for="LastName" class="form-control" placeholder="Enter your last name" required oninput="updatePreview()" id="inputLastName" />
+                </div>
 
-        <div class="form-group">
-            <label asp-for="Weight">Weight (kg)</label>
-            <input asp-for="Weight" type="number" step="0.1" class="form-control" placeholder="Enter your weight" required />
-        </div>
+                <div class="form-group">
+                    <label asp-for="DateOfBirth">Date of Birth</label>
+                    <input asp-for="DateOfBirth" type="date" class="form-control" required oninput="updatePreview()" id="inputDateOfBirth" />
+                </div>
 
-        <div class="form-group">
-            <label asp-for="Height">Height (cm)</label>
-            <input asp-for="Height" type="number" class="form-control" placeholder="Enter your height" required />
-        </div>
+                <div class="form-group">
+                    <label asp-for="Weight">Weight (kg)</label>
+                    <input asp-for="Weight" type="number" step="0.1" class="form-control" placeholder="Enter your weight" required oninput="updatePreview()" id="inputWeight" />
+                </div>
 
-        <div class="form-group">
-            <label asp-for="MonthsOfExperience">Months of Experience</label>
-            <input asp-for="MonthsOfExperience" type="number" class="form-control" placeholder="Enter months of experience" required />
-        </div>
+                <div class="form-group">
+                    <label asp-for="Height">Height (cm)</label>
+                    <input asp-for="Height" type="number" class="form-control" placeholder="Enter your height" required oninput="updatePreview()" id="inputHeight" />
+                </div>
 
-        <button type="submit" class="btn btn-primary">Update Profile</button>
-    </form>
+                <div class="form-group">
+                    <label asp-for="MonthsOfExperience">Months of Experience</label>
+                    <input asp-for="MonthsOfExperience" type="number" class="form-control" placeholder="Enter months of experience" required oninput="updatePreview()" id="inputExperience" />
+                </div>
+
+                <button type="submit" class="btn btn-danger">Update Profile</button>
+            </form>
+        </div>
+    </div>
 </div>
-    
