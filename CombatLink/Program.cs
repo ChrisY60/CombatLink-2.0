@@ -3,6 +3,8 @@ using CombatLink.Repositories;
 using CombatLink.Services.IServices;
 using CombatLink.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using CombatLinkMVC.Models;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,7 @@ builder.Services.AddScoped<IUserRepository>(provider =>
     new UserRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPasswordHasher<Object>, PasswordHasher<Object>>();
 
 var app = builder.Build();
 

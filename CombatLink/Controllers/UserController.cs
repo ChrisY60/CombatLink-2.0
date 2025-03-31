@@ -38,9 +38,7 @@ namespace CombatLink.Controllers
             {
                 return View(model);
             }
-            //add encryption (probably in the service is better)
-            string passwordHash = model.Password;
-            var isRegistered = await _userService.RegisterUserAsync(model.Email, passwordHash);
+            var isRegistered = await _userService.RegisterUserAsync(model.Email, model.Password);
 
             if (isRegistered)
             {
@@ -66,8 +64,8 @@ namespace CombatLink.Controllers
                 return View(model);
             }
             string passwordHash = model.Password;
-            int? id = (int)await _userService.LogInUserAsync(model.Email, passwordHash);
-            if (id != null)
+            int? id = (int?)await _userService.LogInUserAsync(model.Email, passwordHash);
+            if (id.HasValue)
             {
                 var claims = new List<Claim>
                 {

@@ -39,10 +39,10 @@ namespace CombatLink.Repositories
             }
         }
 
-        public async Task<int?> LogInUserAsync(string email, string passwordHash)
+        public async Task<string?> GetPasswordHashByEmail(string email)
         {
-            string query = "SELECT Id FROM Users " +
-                           "WHERE Email = @Email AND PasswordHash = @PasswordHash";
+            string query = "SELECT PasswordHash FROM Users " +
+                           "WHERE Email = @Email";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -51,11 +51,10 @@ namespace CombatLink.Repositories
                 using(var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Email", email);
-                    command.Parameters.AddWithValue("@PasswordHash", passwordHash);
                     var result = await command.ExecuteScalarAsync();
                     if(result != null)
                     {
-                        return Convert.ToInt32(result);
+                        return Convert.ToString(result);
                     }
                 }
                 return null;
@@ -118,6 +117,25 @@ namespace CombatLink.Repositories
             return null;
         }
 
+        public async Task<int?> GetUserIdByEmail(string email)
+        {
+            string query = "SELECT Id FROM Users WHERE email = @userEmail";
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@userEmail", email);
+                    var result = await command.ExecuteScalarAsync();
+                    if (result != null)
+                    {
+                        return Convert.ToInt32(result);
+                    }
+                }
+            }
+            return null;
+        }
 
 
 

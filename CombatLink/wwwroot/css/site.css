@@ -34,7 +34,7 @@ body {
 }
 
 .secondary-background {
-    background-color: #e36a62;
+    background-color: #fcaca7;
 }
 
 .semi-transparent {
@@ -43,6 +43,10 @@ body {
 
 .slightly-transparent {
     background: rgba(255, 255, 255, 0.9);
+}
+
+.rounded-container {
+    border-radius: 25px;
 }
 
 /* ========== ADDITIONAL UI BLOCKS ========== */

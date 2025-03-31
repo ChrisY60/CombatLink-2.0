@@ -9,20 +9,37 @@ namespace CombatLink.Services
     public class UserService : IUserService
     {
         private IUserRepository _userRepository;
-
-        public UserService(IUserRepository userRepository)
+        IPasswordHasher<Object> _passwordHasher;
+        public UserService(IUserRepository userRepository, IPasswordHasher<Object> passwordHasher)
         {
             _userRepository = userRepository;
+            _passwordHasher = passwordHasher;
         }
 
-        public async Task<bool> RegisterUserAsync(string email, string passwordHash)
+        public async Task<bool> RegisterUserAsync(string email, string password)
         {
-            return await _userRepository.RegisterUserAsync(email, passwordHash);
+            string hashedPassword = _passwordHasher.HashPassword(null, password);
+            return await _userRepository.RegisterUserAsync(email, hashedPassword);
         }
 
-        public async Task<int?> LogInUserAsync(string email, string passwordHash)
+        public async Task<int?> LogInUserAsync(string email, string password)
         {
-            return await _userRepository.LogInUserAsync(email, passwordHash);
+            string? hashedPassword = await _userRepository.GetPasswordHashByEmail(email);
+            bool result = _passwordHasher.VerifyHashedPassword(null, hashedPassword, password) == PasswordVerificationResult.Success;
+            if (result)
+            {
+                int? userId = await _userRepository.GetUserIdByEmail(email);
+                if(userId != null)
+                {
+                    return userId;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            return null;
+
         }
         public async Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience)
         {
