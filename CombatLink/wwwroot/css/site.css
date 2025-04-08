@@ -1,7 +1,7 @@
 
 /* ========== GLOBAL TYPOGRAPHY ========== */
 html {
-    font-size: 14px;
+    font-size: 18px;
     position: relative;
     min-height: 100%;
 }
@@ -48,6 +48,7 @@ body {
 .rounded-container {
     border-radius: 25px;
 }
+
 
 /* ========== ADDITIONAL UI BLOCKS ========== */
 .additional-info {
@@ -176,6 +177,12 @@ body {
 }
 
 /* ========== LOGIN PAGE STYLES ========== */
+/* Specific for Profile Management view */
+.profile-card-manage {
+    max-width: 400px;
+    height: 500px;
+}
+
 .login-box {
     height: auto;
 }
@@ -242,3 +249,87 @@ body {
         object-position: center top;
         display: block;
     }
+
+/* PROFILE MANAGEMENT */
+.sport-tag {
+    margin: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.search-sport-container {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.05);
+}
+
+.search-bar {
+    margin-bottom: 0.75rem;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+    .search-bar:focus {
+        border-color: #dc3545;
+        box-shadow: none;
+    }
+
+.custom-sport-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.sport-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    margin-bottom: 0.25rem;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+    .sport-checkbox:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+    }
+
+    .sport-checkbox.active {
+        background-color: rgba(220, 53, 69, 0.15);
+        font-weight: 600;
+    }
+
+    .sport-checkbox input[type="checkbox"] {
+        display: none;
+    }
+
+    .sport-checkbox label {
+        margin: 0;
+        cursor: pointer;
+    }
+
+@media (min-width: 768px) {
+    .sticky-profile {
+        position: sticky;
+        top: 100px;
+        align-self: flex-start;
+    }
+
+    .profile-form-wrapper {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+        padding-right: 1rem;
+    }
+
+    /* Optional: make container full height so layout balances better */
+    .profile-page-row {
+        min-height: 90vh;
+    }
+}
+
+@media (min-width: 992px) {
+    .secondary-container-size {
+        height: 87vh;
+    }
+}

@@ -1,4 +1,5 @@
-﻿using CombatLink.Services.IServices;
+﻿using CombatLink.Repositories.IRepositories;
+using CombatLink.Services.IServices;
 using CombatLink.ViewModels;
 using CombatLinkMVC.Models;
 using Microsoft.AspNetCore.Authentication;
@@ -15,9 +16,14 @@ namespace CombatLink.Controllers
     public class UserController : Controller
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly ISportService _sportsService;
+        private readonly ILanguageService _languageService;
+
+        public UserController(IUserService userService, ISportService sportsService, ILanguageService languageService)
         {
+            _sportsService = sportsService;
             _userService = userService;
+            _languageService = languageService;
         }
 
         public IActionResult Index()
@@ -110,7 +116,12 @@ namespace CombatLink.Controllers
             {
                 return NotFound("User profile not found.");
             }
-            Debug.WriteLine(user.FirstName);
+
+            List<Sport> allSports = (List<Sport>)await _sportsService.GetAllSportsAsync();
+            List<Language> allLanguages = (List<Language>)await _languageService.GetAllLanguagesAsync();
+            List<Language> selectedLanguages = (List<Language>)await _languageService.GetLanguagesByUserIdAsync(userId);
+            List<Sport> selectedSports = (List<Sport>)await _sportsService.GetSportsByUserIdAsync(userId);
+
             UserProfileViewModel model = new UserProfileViewModel
             {
                 FirstName = user.FirstName,
@@ -118,17 +129,20 @@ namespace CombatLink.Controllers
                 DateOfBirth = user.DateOfBirth,
                 Weight = user.Weight,
                 Height = user.Height,
-                MonthsOfExperience = user.MonthsOfExperience
+                MonthsOfExperience = user.MonthsOfExperience,
+                AvailableSports = allSports,
+                AvailableLanguages = allLanguages,
+                SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),
+                SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList()
             };
-
 
             return View(model);
         }
 
+
         [HttpPost]
         public async Task<IActionResult> ManageProfile(UpdateUserProfileManagementViewModel model)
         {
-            Debug.WriteLine("Got here 1");
             if (!ModelState.IsValid)
             {
                 return View(model);

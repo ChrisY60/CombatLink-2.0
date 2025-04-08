@@ -13,5 +13,9 @@ namespace CombatLink.Repositories.IRepositories
         public Task<User?> GetUserById(int userId);
 
         public Task<int?> GetUserIdByEmail(string email);
+
+        public Task<bool> AddSportToUser(Sport sport, User user);
+        public Task<bool> AddLanguageToUser(Language language, User user);
+
     }
 }

@@ -14,6 +14,5 @@
         public ICollection<Sport> Sports { get; set; } = new List<Sport>();
         public ICollection<Language> Languages { get; set; } = new List<Language>();
 
-
     }
 }

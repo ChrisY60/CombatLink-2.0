@@ -137,8 +137,38 @@ namespace CombatLink.Repositories
             return null;
         }
 
+        public async Task<bool> AddSportToUser(Sport sport, User user)
+        {
+            string query = "INSERT INTO Sports_Users (UserId, SportId) VALUES (@UserId, @SportId)";
 
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@UserId", user.Id);
+                    command.Parameters.AddWithValue("@SportId", sport.Id);
 
+                    var result = await command.ExecuteNonQueryAsync();
+                    return result > 0;
+                }
+            }
+        }
+
+        public async Task<bool> AddLanguageToUser(Language language, User user)
+        {
+            string query = "INSERT INTO Languages_Users (UserId, LanguageId) VALUES (@UserId, @LanguageId)";
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@UserId", user.Id);
+            command.Parameters.AddWithValue("@LanguageId", language.Id);
+
+            var result = await command.ExecuteNonQueryAsync();
+            return result > 0;
+        }
 
     }
 }

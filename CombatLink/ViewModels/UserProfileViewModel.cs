@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CombatLinkMVC.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace CombatLink.ViewModels
 {
@@ -11,6 +12,11 @@ namespace CombatLink.ViewModels
         public decimal? Weight { get; set; }
         public decimal? Height { get; set; }
         public int? MonthsOfExperience { get; set; }
+        public List<int> SelectedSportIds { get; set; } = new();
+        public List<int> SelectedLanguageIds { get; set; } = new();
+        public List<Sport> AvailableSports { get; set; } = new();
+        public List<Language> AvailableLanguages { get; set; } = new();
+
 
     }
 }

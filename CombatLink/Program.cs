@@ -24,8 +24,17 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUserRepository>(provider =>
     new UserRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<ISportRepository>(provider =>
+    new SportsRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<ILanguageRepository>(provider =>
+    new LanguageRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ISportService, SportService>();
 builder.Services.AddScoped<IPasswordHasher<Object>, PasswordHasher<Object>>();
+builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 var app = builder.Build();
 
