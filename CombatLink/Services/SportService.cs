@@ -40,15 +40,21 @@ namespace CombatLink.Services
             return await _sportRepository.GetUsersBySportId(sportId);
         }
 
-        public async Task<bool> AddSportsToUserAsync(int userId, List<int> sportIds)
+        public async Task<bool> AddSportsToUserAsync(int userId, List<int> newSportIds)
         {
             var user = await _userRepository.GetUserById(userId);
             if (user == null)
                 return false;
 
+            var currentSports = await _sportRepository.GetSportsByUserId(userId);
+            var currentSportIds = currentSports.Select(s => s.Id).ToList();
+
+            var sportsToAdd = newSportIds.Except(currentSportIds).ToList();
+            var sportsToRemove = currentSportIds.Except(newSportIds).ToList();
+
             bool allSucceeded = true;
 
-            foreach (int sportId in sportIds)
+            foreach (int sportId in sportsToAdd)
             {
                 var sport = await _sportRepository.GetSportById(sportId);
                 if (sport == null)
@@ -56,8 +62,16 @@ namespace CombatLink.Services
                     allSucceeded = false;
                     continue;
                 }
-
                 bool success = await _userRepository.AddSportToUser(sport, user);
+                if (!success)
+                {
+                    allSucceeded = false;
+                }
+            }
+
+            foreach (int sportId in sportsToRemove)
+            {
+                bool success = await _userRepository.RemoveSportFromUser(userId, sportId);
                 if (!success)
                 {
                     allSucceeded = false;
@@ -66,6 +80,7 @@ namespace CombatLink.Services
 
             return allSucceeded;
         }
+
 
     }
 

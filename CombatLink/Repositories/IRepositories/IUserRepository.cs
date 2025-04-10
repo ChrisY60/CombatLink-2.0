@@ -15,7 +15,10 @@ namespace CombatLink.Repositories.IRepositories
         public Task<int?> GetUserIdByEmail(string email);
 
         public Task<bool> AddSportToUser(Sport sport, User user);
+        public Task<bool> RemoveSportFromUser(int userId, int sportId);
         public Task<bool> AddLanguageToUser(Language language, User user);
+
+        public Task<bool> RemoveLanguageFromUser(int userId, int languageId);
 
     }
 }

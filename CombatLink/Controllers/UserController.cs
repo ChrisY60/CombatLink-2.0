@@ -160,16 +160,18 @@ namespace CombatLink.Controllers
                 model.MonthsOfExperience
             );
 
-            if (isUpdated)
+            bool sportsAdded = await _sportsService.AddSportsToUserAsync(userId, model.SelectedSportIds);
+            bool languagesAdded = await _languageService.AddLanguagesToUserAsync(userId, model.SelectedLanguageIds);
+
+            if (isUpdated && sportsAdded && languagesAdded)
             {
                 ViewBag.Message = "Profile updated successfully!";
                 return RedirectToAction("Index", "Home");
             }
-            else
-            {
-                ModelState.AddModelError("", "Failed to update profile.");
-                return View(model);
-            }
+
+            ModelState.AddModelError("", "Failed to update profile completely.");
+            return View(model);
+
         }
     }
 }

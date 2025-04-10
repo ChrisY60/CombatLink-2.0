@@ -22,6 +22,9 @@ namespace CombatLink.ViewModels
         [Required]
         public int MonthsOfExperience { get; set; }
 
+        public List<int> SelectedSportIds { get; set; } = new List<int>();
+        public List<int> SelectedLanguageIds { get; set; } = new List<int>();
+
 
     }
 }

@@ -40,15 +40,21 @@ namespace CombatLink.Services
             return await _languageRepository.GetUsersByLanguageId(languageId);
         }
 
-        public async Task<bool> AddLanguagesToUserAsync(int userId, List<int> languagesIds)
+        public async Task<bool> AddLanguagesToUserAsync(int userId, List<int> newLanguageIds)
         {
             var user = await _userRepository.GetUserById(userId);
             if (user == null)
                 return false;
 
+            var currentLanguages = await _languageRepository.GetLanguagesByUserId(userId);
+            var currentLanguageIds = currentLanguages.Select(l => l.Id).ToList();
+
+            var languagesToAdd = newLanguageIds.Except(currentLanguageIds).ToList();
+            var languagesToRemove = currentLanguageIds.Except(newLanguageIds).ToList();
+
             bool allSucceeded = true;
 
-            foreach (int languageId in languagesIds)
+            foreach (int languageId in languagesToAdd)
             {
                 var language = await _languageRepository.GetLanguageById(languageId);
                 if (language == null)
@@ -64,7 +70,19 @@ namespace CombatLink.Services
                 }
             }
 
+            foreach (int languageId in languagesToRemove)
+            {
+                bool success = await _userRepository.RemoveLanguageFromUser(userId, languageId);
+                if (!success)
+                {
+                    allSucceeded = false;
+                }
+            }
+
             return allSucceeded;
         }
+
+
+
     }
 }

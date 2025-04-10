@@ -88,7 +88,7 @@ namespace CombatLink.Repositories
 
         public async Task<User?> GetUserById(int userId)
         {
-            string query = "SELECT FirstName, LastName, DateOfBirth, Weight, Height, MonthsOfExperience FROM Users WHERE Id = @UserId";
+            string query = "SELECT Id, FirstName, LastName, DateOfBirth, Weight, Height, MonthsOfExperience FROM Users WHERE Id = @UserId";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -103,6 +103,7 @@ namespace CombatLink.Repositories
                         {
                             return new User
                             {
+                                Id = (int)reader["Id"],
                                 FirstName = reader["FirstName"] as string,
                                 LastName = reader["LastName"] as string,
                                 DateOfBirth = reader["DateOfBirth"] as DateTime?,
@@ -116,6 +117,7 @@ namespace CombatLink.Repositories
             }
             return null;
         }
+
 
         public async Task<int?> GetUserIdByEmail(string email)
         {
@@ -154,6 +156,24 @@ namespace CombatLink.Repositories
                 }
             }
         }
+        public async Task<bool> RemoveSportFromUser(int userId, int sportId)
+        {
+            string query = "DELETE FROM Sports_Users WHERE UserId = @UserId AND SportId = @SportId";
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@SportId", sportId);
+
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
 
         public async Task<bool> AddLanguageToUser(Language language, User user)
         {
@@ -169,6 +189,24 @@ namespace CombatLink.Repositories
             var result = await command.ExecuteNonQueryAsync();
             return result > 0;
         }
+        public async Task<bool> RemoveLanguageFromUser(int userId, int languageId)
+        {
+            string query = "DELETE FROM Languages_Users WHERE UserId = @UserId AND LanguageId = @LanguageId";
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@UserId", userId);
+                    command.Parameters.AddWithValue("@LanguageId", languageId);
+
+                    int rowsAffected = await command.ExecuteNonQueryAsync();
+                    return rowsAffected > 0;
+                }
+            }
+        }
+
 
     }
 }
