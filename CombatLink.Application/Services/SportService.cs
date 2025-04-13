@@ -1,8 +1,8 @@
-﻿using CombatLink.Repositories.IRepositories;
-using CombatLink.Services.IServices;
-using CombatLinkMVC.Models;
+﻿using CombatLink.Domain.IRepositories;
+using CombatLink.Domain.IServices;
+using CombatLink.Domain.Models;
 
-namespace CombatLink.Services
+namespace CombatLink.Application.Services
 {
     public class SportService : ISportService
     {

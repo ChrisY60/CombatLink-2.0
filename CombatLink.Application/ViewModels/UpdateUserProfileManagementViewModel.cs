@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CombatLink.ViewModels
+namespace CombatLink.Application.ViewModels
 {
     public class UpdateUserProfileManagementViewModel
     {
         [Required]
-        public string FirstName {  get; set; }
+        public string FirstName { get; set; }
 
         [Required]
         public string LastName { get; set; }

@@ -1,16 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CombatLink.ViewModels
+namespace CombatLink.Application.ViewModels
 {
-    public class LogInViewModel
+    public class RegisterViewModel
     {
         [Required]
         [EmailAddress]
         public string Email { get; set; }
 
         [Required]
-        public string Password {  get; set; }
-
-
+        public string Password { get; set; }
     }
 }

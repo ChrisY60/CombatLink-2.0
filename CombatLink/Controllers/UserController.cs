@@ -1,7 +1,6 @@
-﻿using CombatLink.Repositories.IRepositories;
-using CombatLink.Services.IServices;
-using CombatLink.ViewModels;
-using CombatLinkMVC.Models;
+﻿using CombatLink.Application.ViewModels;
+using CombatLink.Domain.IServices;
+using CombatLink.Domain.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +9,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Security.Claims;
 
-namespace CombatLink.Controllers
+namespace CombatLink.Web.Controllers
 {
     [Authorize]
     public class UserController : Controller
@@ -49,7 +48,8 @@ namespace CombatLink.Controllers
             if (isRegistered)
             {
                 return RedirectToAction("LogIn", "User");
-            }else
+            }
+            else
             {
                 return View();
             }

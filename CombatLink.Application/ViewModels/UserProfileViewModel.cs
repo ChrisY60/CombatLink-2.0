@@ -1,11 +1,9 @@
-﻿using CombatLinkMVC.Models;
-using System.ComponentModel.DataAnnotations;
-
-namespace CombatLink.ViewModels
+﻿using CombatLink.Domain.Models;
+namespace CombatLink.Application.ViewModels
 {
-    public class UserProfileViewModel 
-    { 
-    
+    public class UserProfileViewModel
+    {
+
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public DateTime? DateOfBirth { get; set; }

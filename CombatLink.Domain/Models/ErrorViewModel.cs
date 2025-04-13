@@ -1,4 +1,4 @@
-namespace CombatLink.Models
+namespace CombatLink.Domain.Models
 {
     public class ErrorViewModel
     {

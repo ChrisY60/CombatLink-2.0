@@ -1,16 +1,16 @@
-﻿using CombatLink.Repositories.IRepositories;
-using CombatLink.Services.IServices;
-using CombatLinkMVC.Models;
+﻿using CombatLink.Domain.IRepositories;
+using CombatLink.Domain.IServices;
+using CombatLink.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Diagnostics;
 
-namespace CombatLink.Services
+namespace CombatLink.Application.Services
 {
     public class UserService : IUserService
     {
         private IUserRepository _userRepository;
-        IPasswordHasher<Object> _passwordHasher;
-        public UserService(IUserRepository userRepository, IPasswordHasher<Object> passwordHasher)
+        IPasswordHasher<object> _passwordHasher;
+        public UserService(IUserRepository userRepository, IPasswordHasher<object> passwordHasher)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
@@ -29,7 +29,7 @@ namespace CombatLink.Services
             if (result)
             {
                 int? userId = await _userRepository.GetUserIdByEmail(email);
-                if(userId != null)
+                if (userId != null)
                 {
                     return userId;
                 }

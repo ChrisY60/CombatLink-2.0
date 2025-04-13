@@ -1,9 +1,9 @@
-using CombatLink.Models;
+using CombatLink.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace CombatLink.Controllers
+namespace CombatLink.Web.Controllers
 {
     [Authorize]
     public class HomeController : Controller

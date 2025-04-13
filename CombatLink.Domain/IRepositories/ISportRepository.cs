@@ -1,6 +1,6 @@
-﻿using CombatLinkMVC.Models;
+﻿using CombatLink.Domain.Models;
 
-namespace CombatLink.Repositories.IRepositories
+namespace CombatLink.Domain.IRepositories
 {
     public interface ISportRepository
     {

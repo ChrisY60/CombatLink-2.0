@@ -1,6 +1,6 @@
-﻿namespace CombatLinkMVC.Models
+﻿namespace CombatLink.Domain.Models
 {
-    public class Sport
+    public class Language
     {
         public int Id { get; set; }
         public string Name { get; set; }

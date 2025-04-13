@@ -1,6 +1,6 @@
-﻿using CombatLinkMVC.Models;
+﻿using CombatLink.Domain.Models;
 
-namespace CombatLink.Services.IServices
+namespace CombatLink.Domain.IServices
 {
     public interface ILanguageService
     {

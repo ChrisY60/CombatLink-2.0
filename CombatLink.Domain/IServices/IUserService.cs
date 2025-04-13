@@ -1,6 +1,6 @@
-﻿using CombatLinkMVC.Models;
+﻿using CombatLink.Domain.Models;
 
-namespace CombatLink.Services.IServices
+namespace CombatLink.Domain.IServices
 {
     public interface IUserService
     {
@@ -9,7 +9,7 @@ namespace CombatLink.Services.IServices
         Task<int?> LogInUserAsync(string email, string password);
 
         Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience);
-    
+
         Task<User?> GetUserById(int userId);
     }
 

@@ -1,4 +1,4 @@
-﻿namespace CombatLinkMVC.Models
+﻿namespace CombatLink.Domain.Models
 {
     public class User
     {

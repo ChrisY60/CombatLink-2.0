@@ -1,45 +1,69 @@
-﻿using CombatLinkMVC.Models;
-using CombatLink.Repositories.IRepositories;
+﻿using CombatLink.Domain.IRepositories;
+using CombatLink.Domain.Models;
 using Microsoft.Data.SqlClient;
-namespace CombatLink.Repositories
+
+namespace CombatLink.Infrastructure.Repositories
 {
-    public class SportsRepository : ISportRepository
+    public class LanguageRepository : ILanguageRepository
     {
         private readonly string _connectionString;
 
-        public SportsRepository(string connectionString)
+        public LanguageRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public async Task<bool> CreateSport(Sport sport)
+        public async Task<bool> CreateLanguage(Language language)
         {
-            string query = "INSERT INTO Sports (Name) VALUES (@Name)";
+            string query = "INSERT INTO Languages (Name) VALUES (@Name)";
 
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
             using var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@Name", sport.Name);
+            command.Parameters.AddWithValue("@Name", language.Name);
 
             int result = await command.ExecuteNonQueryAsync();
             return result > 0;
         }
 
-        public async Task<Sport?> GetSportById(int sportId)
+        public async Task<IEnumerable<Language>> GetAllLanguages()
         {
-            string query = "SELECT Id, Name FROM Sports WHERE Id = @Id";
+            string query = "SELECT Id, Name FROM Languages";
 
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
             using var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@Id", sportId);
+
+            using var reader = await command.ExecuteReaderAsync();
+            List<Language> languages = new List<Language>();
+            while (await reader.ReadAsync())
+            {
+                languages.Add(new Language
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1)
+                });
+            }
+
+            return languages;
+        }
+
+        public async Task<Language> GetLanguageById(int languageId)
+        {
+            string query = "SELECT Id, Name FROM Languages WHERE Id = @Id";
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@Id", languageId);
 
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
             {
-                return new Sport
+                return new Language
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1)
@@ -49,36 +73,13 @@ namespace CombatLink.Repositories
             return null;
         }
 
-        public async Task<IEnumerable<Sport>> GetAllSports()
+        public async Task<IEnumerable<Language>> GetLanguagesByUserId(int userId)
         {
-            var sports = new List<Sport>();
-            string query = "SELECT Id, Name FROM Sports";
-
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-
-            using var command = new SqlCommand(query, connection);
-            using var reader = await command.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
-            {
-                sports.Add(new Sport
-                {
-                    Id = reader.GetInt32(0),
-                    Name = reader.GetString(1)
-                });
-            }
-
-            return sports;
-        }
-
-        public async Task<IEnumerable<Sport>> GetSportsByUserId(int userId)
-        {
-            var sports = new List<Sport>();
-            string query = @"SELECT s.Id, s.Name 
-                             FROM Sports s
-                             INNER JOIN Sports_Users us ON s.Id = us.SportId
-                             WHERE us.UserId = @UserId";
+            List<Language> languages = new List<Language>();
+            string query = @"SELECT l.Id, l.Name 
+                             FROM Languages l
+                             INNER JOIN Languages_Users lu ON l.Id = lu.LanguageId
+                             WHERE lu.UserId = @UserId";
 
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
@@ -89,31 +90,31 @@ namespace CombatLink.Repositories
 
             while (await reader.ReadAsync())
             {
-                sports.Add(new Sport
+                languages.Add(new Language
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1)
                 });
             }
 
-            return sports;
+            return languages;
         }
 
-        public async Task<IEnumerable<User>> GetUsersBySportId(int sportId)
+        public async Task<IEnumerable<User>> GetUsersByLanguageId(int languageId)
         {
-            var users = new List<User>();
-            string query = @"SELECT u.Id, u.Email 
-                             FROM Users u
-                             INNER JOIN UserSport us ON u.Id = us.UserId
-                             WHERE us.SportId = @SportId";
+            List<User> users = new List<User>();
+            string query = @"SELECT u.Id, u.Email
+                     FROM Users u
+                     INNER JOIN Languages_Users lu ON u.Id = lu.UserId
+                     WHERE lu.LanguageId = @LanguageId";
 
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
 
             using var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@SportId", sportId);
-            using var reader = await command.ExecuteReaderAsync();
+            command.Parameters.AddWithValue("@LanguageId", languageId);
 
+            using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
                 users.Add(new User

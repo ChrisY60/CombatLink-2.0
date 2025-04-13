@@ -1,6 +1,6 @@
-﻿using CombatLinkMVC.Models;
+﻿using CombatLink.Domain.Models;
 
-namespace CombatLink.Repositories.IRepositories
+namespace CombatLink.Domain.IRepositories
 {
     public interface IUserRepository
     {
@@ -9,7 +9,7 @@ namespace CombatLink.Repositories.IRepositories
         public Task<string?> GetPasswordHashByEmail(string email);
 
         public Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience);
-    
+
         public Task<User?> GetUserById(int userId);
 
         public Task<int?> GetUserIdByEmail(string email);

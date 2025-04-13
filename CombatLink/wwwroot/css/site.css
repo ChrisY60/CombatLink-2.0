@@ -322,7 +322,6 @@ body {
         padding-right: 1rem;
     }
 
-    /* Optional: make container full height so layout balances better */
     .profile-page-row {
         min-height: 90vh;
     }
@@ -332,4 +331,30 @@ body {
     .secondary-container-size {
         height: 87vh;
     }
+}
+.upload-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    height: 100%;
+    width: 100%;
+}
+
+    .upload-wrapper img {
+        object-fit: cover;
+        transition: opacity 0.3s ease;
+    }
+
+.upload-overlay {
+    background-color: rgba(100, 0, 0, 0.8);
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.upload-wrapper:hover .upload-overlay {
+    opacity: 1;
 }

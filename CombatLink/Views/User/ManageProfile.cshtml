@@ -1,5 +1,5 @@
-﻿@using CombatLinkMVC.Models
-@model CombatLink.ViewModels.UserProfileViewModel
+﻿@using CombatLink.Domain.Models
+@model CombatLink.Application.ViewModels.UserProfileViewModel
 
 @{
     ViewData["Title"] = "Profile Management";
@@ -14,9 +14,14 @@
         <div class="col-md-6 profile-col-wrapper">
             <div class="fixed-card-container">
                 <div class="profile-card profile-card-manage">
-                    <div class="profile-image">
-                        <img src="https://d2779tscntxxsw.cloudfront.net/5a72451098031.png?width=1200&quality=80" alt="Profile Picture">
+                    <div class="profile-image upload-wrapper position-relative">
+                        <label for="profileImageUpload" class="w-100 h-100 m-0 p-0 position-absolute top-0 start-0 z-2 upload-overlay d-flex justify-content-center align-items-center text-white">
+                            <span class="upload-text">Change Photo</span>
+                        </label>
+                        <img src="https://d2779tscntxxsw.cloudfront.net/5a72451098031.png?width=1200&quality=80" alt="Profile Picture" class="w-100 h-100" />
+                        <input type="file" id="profileImageUpload" name="ProfileImage" accept="image/*" class="d-none" />
                     </div>
+
                     <div class="profile-bio">
                         <h2>@Model.FirstName @Model.LastName</h2>
                         <p>@Model.Weight Kg &nbsp;&nbsp; @Model.Height Cm</p>

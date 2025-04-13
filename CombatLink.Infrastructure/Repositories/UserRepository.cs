@@ -1,9 +1,8 @@
-﻿using CombatLink.Repositories.IRepositories;
-using CombatLinkMVC.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using CombatLink.Domain.IRepositories;
+using CombatLink.Domain.Models;
 using Microsoft.Data.SqlClient;
 
-namespace CombatLink.Repositories
+namespace CombatLink.Infrastructure.Repositories
 {
     public class UserRepository : IUserRepository
     {
@@ -31,7 +30,8 @@ namespace CombatLink.Repositories
                     if (result > 0)
                     {
                         return true;
-                    }else
+                    }
+                    else
                     {
                         return false;
                     }
@@ -48,11 +48,11 @@ namespace CombatLink.Repositories
             {
                 await connection.OpenAsync();
 
-                using(var command = new SqlCommand(query, connection))
+                using (var command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Email", email);
                     var result = await command.ExecuteScalarAsync();
-                    if(result != null)
+                    if (result != null)
                     {
                         return Convert.ToString(result);
                     }

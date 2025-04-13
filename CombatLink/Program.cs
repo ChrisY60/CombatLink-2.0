@@ -1,10 +1,9 @@
-using CombatLink.Repositories.IRepositories;
-using CombatLink.Repositories;
-using CombatLink.Services.IServices;
-using CombatLink.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using CombatLinkMVC.Models;
 using Microsoft.AspNetCore.Identity;
+using CombatLink.Infrastructure.Repositories;
+using CombatLink.Domain.IRepositories;
+using CombatLink.Domain.IServices;
+using CombatLink.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
