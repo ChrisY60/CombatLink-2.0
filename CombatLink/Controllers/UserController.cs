@@ -17,12 +17,14 @@ namespace CombatLink.Web.Controllers
         private readonly IUserService _userService;
         private readonly ISportService _sportsService;
         private readonly ILanguageService _languageService;
+        private readonly IUserPreferenceService _userPreferenceService;
 
-        public UserController(IUserService userService, ISportService sportsService, ILanguageService languageService)
+        public UserController(IUserService userService, ISportService sportsService, ILanguageService languageService, IUserPreferenceService userPreferenceService)
         {
             _sportsService = sportsService;
             _userService = userService;
             _languageService = languageService;
+            _userPreferenceService = userPreferenceService;
         }
 
         public IActionResult Index()
@@ -173,5 +175,56 @@ namespace CombatLink.Web.Controllers
             return View(model);
 
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ManagePreference()
+        {
+            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var preference = await _userPreferenceService.GetByUserIdAsync(userId);
+
+            if (preference == null)
+            {
+                preference = new UserPreference();
+            }
+
+            var viewModel = new UpdateUserPreferencesViewModel
+            {
+                WeightMin = preference.WeightMin,
+                WeightMax = preference.WeightMax,
+                HeightMin = preference.HeightMin,
+                HeightMax = preference.HeightMax,
+                ExperienceMin = preference.ExperienceMin,
+                ExperienceMax = preference.ExperienceMax
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ManagePreference(UpdateUserPreferencesViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var preference = new UserPreference
+            {
+                WeightMin = model.WeightMin,
+                WeightMax = model.WeightMax,
+                HeightMin = model.HeightMin,
+                HeightMax = model.HeightMax,
+                ExperienceMin = model.ExperienceMin,
+                ExperienceMax = model.ExperienceMax,
+                RelatedUser = new User { Id = userId }
+            };
+
+            await _userPreferenceService.CreateOrUpdateAsync(preference);
+
+            TempData["Message"] = "Preference saved successfully!";
+            return RedirectToAction("Index", "Home");
+        }
+
+
     }
 }
