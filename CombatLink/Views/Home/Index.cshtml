@@ -1,84 +1,54 @@
-﻿@{
+﻿@model CombatLink.Application.ViewModels.IndexViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
-
 <script src="~/js/swiper.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+@if (Model?.Users == null || Model.Users.Count == 0)
+{
+    <p> No users with this criteria available :(</p>
+    <p> Go to your profile to customize it in order to get opponents!</p>
+}
+else
+{
+    int counter = 0;
+    
+    <div id="swiper">
+        @foreach (User user in Model.Users)
+        {
+            counter++;
 
-<div id="swiper">
+            <div class="recommendation">
+                <div class="profile-card" style="--i:@counter">
+                    <div class="profile-image">
+                        <img src="https://d2779tscntxxsw.cloudfront.net/5a72451098031.png?width=1200&quality=80" alt="Profile Picture">
+                    </div>
+                    <div class="profile-bio">
+                        <h2>@user.FirstName @user.LastName</h2>
+                        <p>@user.Weight Kg &nbsp;&nbsp; @user.Height Cm</p>
+                        <div class="tags">
+                            @foreach (var sport in user.Sports.Take(3))
+                            {
+                                <button class="tag">@sport.Name</button>
+                            }
+                            @if (user.Sports.Count > 3)
+                            {
+                                <button class="tag more">more</button>
+                            }
+                        </div>
+                    </div>
+                </div>
 
-    <div class="recommendation">
-        <div class="profile-card" style="--i:1">
-            <div class="profile-image">
-                <img src="https://d2779tscntxxsw.cloudfront.net/5a72451098031.png?width=1200&quality=80" alt="Profile Picture">
-            </div>
-            <div class="profile-bio">
-                <h2>Christiyan Yankov</h2>
-                <p>83 Kg &nbsp;&nbsp; 195 Cm</p>
-                <div class="tags">
-                    <button class="tag">MMA</button>
-                    <button class="tag">Boxing</button>
-                    <button class="tag">BJJ</button>
-                    <button class="tag more">more</button>
+                <div class="additional-info">
+                    <p><strong>Location:</strong> 5km away</p>
+                    <p><strong>Trained for:</strong> @user.MonthsOfExperience months</p>
+                    <p><strong>Languages:</strong> @string.Join(", ", user.Languages.Select(l => l.Name))</p>
                 </div>
             </div>
-        </div>
-
-        <div class="additional-info">
-            <p><strong>Location:</strong> 5km away</p>
-            <p><strong>Trained for:</strong> 7 years</p>
-            <p><strong>Languages:</strong> English, Spanish</p>
-        </div>
+        }
     </div>
+}
 
-    <div class="recommendation">
-        <div class="profile-card" style="--i:2">
-            <div class="profile-image">
-                <img src="https://d2779tscntxxsw.cloudfront.net/5a72451098031.png?width=1200&quality=80" alt="Profile Picture">
-            </div>
-            <div class="profile-bio">
-                <h2>Christiyan Yankov</h2>
-                <p>83 Kg &nbsp;&nbsp; 195 Cm</p>
-                <div class="tags">
-                    <button class="tag">MMA</button>
-                    <button class="tag">Boxing</button>
-                    <button class="tag">BJJ</button>
-                    <button class="tag more">more</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="additional-info">
-            <p><strong>Location:</strong> 5km away</p>
-            <p><strong>Trained for:</strong> 7 years</p>
-            <p><strong>Languages:</strong> English, Spanish</p>
-        </div>
-    </div>
-
-    <div class="recommendation">
-        <div class="profile-card" style="--i:3">
-            <div class="profile-image">
-                <img src="https://phantom-marca.unidadeditorial.es/2cf4dd89576cf80075d119bc77c966ed/resize/1200/f/webp/assets/multimedia/imagenes/2024/06/30/17197425533727.png" alt="Profile Picture">
-            </div>
-            <div class="profile-bio">
-                <h2>Christiyan Yankov</h2>
-                <p>83 Kg &nbsp;&nbsp; 195 Cm</p>
-                <div class="tags">
-                    <button class="tag">MMA</button>
-                    <button class="tag">Boxing</button>
-                    <button class="tag">BJJ</button>
-                    <button class="tag more">more</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="additional-info">
-            <p><strong>Location:</strong> 5km away</p>
-            <p><strong>Trained for:</strong> 7 years</p>
-            <p><strong>Languages:</strong> English, Spanish</p>
-        </div>
-    </div>
-</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

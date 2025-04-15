@@ -1,7 +1,10 @@
+using CombatLink.Application.ViewModels;
+using CombatLink.Domain.IServices;
 using CombatLink.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace CombatLink.Web.Controllers
 {
@@ -9,15 +12,22 @@ namespace CombatLink.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IMatchmakingService _matchmakingService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IMatchmakingService matchmakingService)
         {
             _logger = logger;
+            _matchmakingService = matchmakingService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
-            return View();
+            int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            List<User> users = await _matchmakingService.GetRecommendedUsersForUserIdAsync(userId);
+            return View(new IndexViewModel
+            {
+                Users = users
+            });
         }
 
         public IActionResult Privacy()

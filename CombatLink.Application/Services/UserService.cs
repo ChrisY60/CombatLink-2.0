@@ -1,8 +1,12 @@
 ﻿using CombatLink.Domain.IRepositories;
 using CombatLink.Domain.IServices;
 using CombatLink.Domain.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace CombatLink.Application.Services
 {
@@ -39,7 +43,6 @@ namespace CombatLink.Application.Services
                 }
             }
             return null;
-
         }
         public async Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience)
         {

@@ -4,6 +4,7 @@ using CombatLink.Infrastructure.Repositories;
 using CombatLink.Domain.IRepositories;
 using CombatLink.Domain.IServices;
 using CombatLink.Application.Services;
+using CombatLink.Web.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,9 @@ builder.Services.AddScoped<ISportService, SportService>();
 builder.Services.AddScoped<IPasswordHasher<Object>, PasswordHasher<Object>>();
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 builder.Services.AddScoped<IUserPreferenceService, UserPreferenceService>();
+builder.Services.AddScoped<IMatchmakingService, MatchmakingService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 var app = builder.Build();
 

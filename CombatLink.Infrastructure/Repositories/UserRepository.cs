@@ -206,6 +206,36 @@ namespace CombatLink.Infrastructure.Repositories
                 }
             }
         }
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            string query = "SELECT Id, Email, FirstName, LastName, DateOfBirth, Weight, Height, MonthsOfExperience FROM Users";
+            var users = new List<User>();
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new SqlCommand(query, connection);
+            using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                var user = new User
+                {
+                    Id = (int)reader["Id"],
+                    Email = reader["Email"] as string,
+                    FirstName = reader["FirstName"] as string,
+                    LastName = reader["LastName"] as string,
+                    DateOfBirth = reader["DateOfBirth"] as DateTime?,
+                    Weight = reader["Weight"] as decimal?,
+                    Height = reader["Height"] as decimal?,
+                    MonthsOfExperience = reader["MonthsOfExperience"] as int?
+                };
+
+                users.Add(user);
+            }
+
+            return users;
+        }
 
 
     }

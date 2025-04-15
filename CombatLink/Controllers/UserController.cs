@@ -1,6 +1,7 @@
 ﻿using CombatLink.Application.ViewModels;
 using CombatLink.Domain.IServices;
 using CombatLink.Domain.Models;
+using CombatLink.Web.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -18,19 +19,20 @@ namespace CombatLink.Web.Controllers
         private readonly ISportService _sportsService;
         private readonly ILanguageService _languageService;
         private readonly IUserPreferenceService _userPreferenceService;
+        private readonly IMatchmakingService _matchmakingService;
+        private readonly IAuthService _authService;
 
-        public UserController(IUserService userService, ISportService sportsService, ILanguageService languageService, IUserPreferenceService userPreferenceService)
+
+        public UserController(IUserService userService, ISportService sportsService, ILanguageService languageService, IUserPreferenceService userPreferenceService, IMatchmakingService matchmakingService, IAuthService authService)
         {
             _sportsService = sportsService;
             _userService = userService;
             _languageService = languageService;
             _userPreferenceService = userPreferenceService;
+            _matchmakingService = matchmakingService;
+            _authService = authService;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
 
         [AllowAnonymous]
         public IActionResult Register()
@@ -71,30 +73,10 @@ namespace CombatLink.Web.Controllers
             {
                 return View(model);
             }
-            string passwordHash = model.Password;
-            int? id = (int?)await _userService.LogInUserAsync(model.Email, passwordHash);
+            int? id = await _userService.LogInUserAsync(model.Email, model.Password);
             if (id.HasValue)
             {
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, model.Email),
-                    new Claim(ClaimTypes.NameIdentifier, id.ToString()),
-                    new Claim(ClaimTypes.Role, "User")
-                };
-
-                ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                AuthenticationProperties authenticationProperties = new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                    ExpiresUtc = DateTime.UtcNow.AddHours(1)
-                };
-
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authenticationProperties
-                );
-
+                await _authService.SignInAsync(HttpContext, id.Value, model.Email);
                 return RedirectToAction("Index", "Home");
             }
             else
@@ -124,19 +106,7 @@ namespace CombatLink.Web.Controllers
             List<Language> selectedLanguages = (List<Language>)await _languageService.GetLanguagesByUserIdAsync(userId);
             List<Sport> selectedSports = (List<Sport>)await _sportsService.GetSportsByUserIdAsync(userId);
 
-            UserProfileViewModel model = new UserProfileViewModel
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                DateOfBirth = user.DateOfBirth,
-                Weight = user.Weight,
-                Height = user.Height,
-                MonthsOfExperience = user.MonthsOfExperience,
-                AvailableSports = allSports,
-                AvailableLanguages = allLanguages,
-                SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),
-                SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList()
-            };
+            UserProfileViewModel model = new UserProfileViewModel{FirstName = user.FirstName,LastName = user.LastName,DateOfBirth = user.DateOfBirth,Weight = user.Weight,Height = user.Height,MonthsOfExperience = user.MonthsOfExperience,AvailableSports = allSports,AvailableLanguages = allLanguages,SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList()};
 
             return View(model);
         }
@@ -152,16 +122,7 @@ namespace CombatLink.Web.Controllers
 
             int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            bool isUpdated = await _userService.UpdateUserProfile(
-                userId,
-                model.FirstName,
-                model.LastName,
-                model.DateOfBirth,
-                model.Weight,
-                model.Height,
-                model.MonthsOfExperience
-            );
-
+            bool isUpdated = await _userService.UpdateUserProfile(userId,model.FirstName,model.LastName,model.DateOfBirth,model.Weight,model.Height,model.MonthsOfExperience);
             bool sportsAdded = await _sportsService.AddSportsToUserAsync(userId, model.SelectedSportIds);
             bool languagesAdded = await _languageService.AddLanguagesToUserAsync(userId, model.SelectedLanguageIds);
 
@@ -187,15 +148,7 @@ namespace CombatLink.Web.Controllers
                 preference = new UserPreference();
             }
 
-            var viewModel = new UpdateUserPreferencesViewModel
-            {
-                WeightMin = preference.WeightMin,
-                WeightMax = preference.WeightMax,
-                HeightMin = preference.HeightMin,
-                HeightMax = preference.HeightMax,
-                ExperienceMin = preference.ExperienceMin,
-                ExperienceMax = preference.ExperienceMax
-            };
+            var viewModel = new UpdateUserPreferencesViewModel{WeightMin = preference.WeightMin,WeightMax = preference.WeightMax,HeightMin = preference.HeightMin,HeightMax = preference.HeightMax,ExperienceMin = preference.ExperienceMin,ExperienceMax = preference.ExperienceMax};
 
             return View(viewModel);
         }
@@ -208,20 +161,9 @@ namespace CombatLink.Web.Controllers
 
             int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
 
-            var preference = new UserPreference
-            {
-                WeightMin = model.WeightMin,
-                WeightMax = model.WeightMax,
-                HeightMin = model.HeightMin,
-                HeightMax = model.HeightMax,
-                ExperienceMin = model.ExperienceMin,
-                ExperienceMax = model.ExperienceMax,
-                RelatedUser = new User { Id = userId }
-            };
-
+            var preference = new UserPreference{WeightMin = model.WeightMin,WeightMax = model.WeightMax,HeightMin = model.HeightMin,HeightMax = model.HeightMax,ExperienceMin = model.ExperienceMin,ExperienceMax = model.ExperienceMax, RelatedUser = new User { Id = userId }};
             await _userPreferenceService.CreateOrUpdateAsync(preference);
 
-            TempData["Message"] = "Preference saved successfully!";
             return RedirectToAction("Index", "Home");
         }
 

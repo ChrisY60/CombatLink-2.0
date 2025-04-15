@@ -2,8 +2,9 @@
 
 namespace CombatLink.Domain.IRepositories
 {
-    public interface IUserRepository
+    public interface IUserRepository 
     {
+        Task<IEnumerable<User>> GetAllUsersAsync();
         public Task<bool> RegisterUserAsync(string email, string passwordHash);
 
         public Task<string?> GetPasswordHashByEmail(string email);
