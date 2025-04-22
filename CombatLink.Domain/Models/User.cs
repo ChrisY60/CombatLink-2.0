@@ -11,6 +11,7 @@
         public decimal? Weight { get; set; }
         public decimal? Height { get; set; }
         public int? MonthsOfExperience { get; set; }
+        public string? ImageUrl { get; set; }
         public ICollection<Sport> Sports { get; set; } = new List<Sport>();
         public ICollection<Language> Languages { get; set; } = new List<Language>();
 
