@@ -10,9 +10,10 @@
 <div class="container mt-4 p-4 rounded-container shadow-lg secondary-background secondary-container-size">
     <h2 class="text-center">Profile Management</h2>
 
-    <a asp-controller="User" asp-action="ManagePreference" class="btn btn-outline-danger w-100 mt-3" style="margin-bottom: 1vh">
+    <a asp-controller="User" asp-action="ManagePreference" class="btn btn-outline-danger w-100 mt-3 mb-3">
         Manage Sparring Preferences
     </a>
+
     <div class="row profile-page-row">
         <div class="col-md-6 profile-col-wrapper">
             <div class="fixed-card-container">
@@ -21,8 +22,15 @@
                         <label for="profileImageUpload" class="w-100 h-100 m-0 p-0 position-absolute top-0 start-0 z-2 upload-overlay d-flex justify-content-center align-items-center text-white">
                             <span class="upload-text">Change Photo</span>
                         </label>
-                        <img src="https://d2779tscntxxsw.cloudfront.net/5a72451098031.png?width=1200&quality=80" alt="Profile Picture" class="w-100 h-100" />
-                        <input type="file" id="profileImageUpload" name="ProfileImage" accept="image/*" class="d-none" />
+                        @if (!string.IsNullOrEmpty(Model.ProfilePictureURL))
+                        {
+                            <img src="@Model.ProfilePictureURL" alt="Profile Picture" class="w-100 h-100" />
+                        }
+                        else
+                        {
+                            <img src="https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg" />
+                        }
+
                     </div>
 
                     <div class="profile-bio">
@@ -41,7 +49,12 @@
         </div>
 
         <div class="col-md-6 profile-form-wrapper" style="margin-top: 2vh">
-            <form asp-action="ManageProfile" method="post" class="profile-form">
+            <form asp-action="ManageProfile" method="post" enctype="multipart/form-data" class="profile-form">
+                <div class="form-group">
+                    <label for="profileImageUpload">Profile Picture</label>
+                    <input type="file" id="profileImageUpload" name="ProfilePicture" accept="image/*" class="form-control" />
+                </div>
+
                 <div class="form-group">
                     <label asp-for="FirstName">First Name</label>
                     <input asp-for="FirstName" class="form-control" required />
@@ -112,95 +125,103 @@
                     </div>
                 </div>
 
-
-
-
                 <button type="submit" class="btn btn-danger">Update Profile</button>
             </form>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    function updateSelectedBadges() {
-        const container = $('#selectedBadges');
-        container.empty();
-        $('#sportList input[type="checkbox"]:checked').each(function () {
-            const id = $(this).val();
-            const label = $(this).closest('.sport-checkbox').find('label').text();
-            const badge = $(`<span class="badge badge-danger sport-tag" data-id="${id}">${label}
-                    <button type="button" class="close ml-1" style="font-size:1rem;" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button></span>`);
-            badge.find('button').on('click', function () {
-                const box = $(`#sportList input[value="${id}"]`);
-                box.prop('checked', false);
-                box.closest('.sport-checkbox').removeClass('active');
-                updateSelectedBadges();
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function updateSelectedBadges() {
+            const container = $('#selectedBadges');
+            container.empty();
+            $('#sportList input[type="checkbox"]:checked').each(function () {
+                const id = $(this).val();
+                const label = $(this).closest('.sport-checkbox').find('label').text();
+                const badge = $(`<span class="badge badge-danger sport-tag" data-id="${id}">${label}
+                                <button type="button" class="close ml-1" style="font-size:1rem;" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button></span>`);
+                badge.find('button').on('click', function () {
+                    const box = $(`#sportList input[value="${id}"]`);
+                    box.prop('checked', false);
+                    box.closest('.sport-checkbox').removeClass('active');
+                    updateSelectedBadges();
+                });
+                container.append(badge);
             });
-            container.append(badge);
-        });
-    }
+        }
 
-    function toggleCheckbox(element) {
-        const checkbox = $(element).find('input[type="checkbox"]');
-        const isChecked = checkbox.prop("checked");
-        checkbox.prop("checked", !isChecked);
-        $(element).toggleClass("active", !isChecked);
-        updateSelectedBadges();
-    }
+        function toggleCheckbox(element) {
+            const checkbox = $(element).find('input[type="checkbox"]');
+            const isChecked = checkbox.prop("checked");
+            checkbox.prop("checked", !isChecked);
+            $(element).toggleClass("active", !isChecked);
+            updateSelectedBadges();
+        }
 
-    $(document).ready(function () {
-        updateSelectedBadges();
-        $('#sportSearch').on('input', function () {
-            const search = $(this).val().toLowerCase();
-            $('#sportList .sport-checkbox').each(function () {
-                const name = $(this).data('name');
-                $(this).toggle(name.includes(search));
+        function updateSelectedLanguageBadges() {
+            const container = $('#selectedLanguageBadges');
+            container.empty();
+            $('#languageList input[type="checkbox"]:checked').each(function () {
+                const id = $(this).val();
+                const label = $(this).closest('.sport-checkbox').find('label').text();
+                const badge = $(`<span class="badge badge-danger sport-tag mr-1 mb-1" data-id="${id}">${label}
+                                <button type="button" class="close ml-1" style="font-size:1rem;" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button></span>`);
+                badge.find('button').on('click', function () {
+                    const box = $(`#languageList input[value="${id}"]`);
+                    box.prop('checked', false);
+                    box.closest('.sport-checkbox').removeClass('active');
+                    updateSelectedLanguageBadges();
+                });
+                container.append(badge);
+            });
+        }
+
+        function toggleLanguageCheckbox(element) {
+            const checkbox = $(element).find('input[type="checkbox"]');
+            const isChecked = checkbox.prop("checked");
+            checkbox.prop("checked", !isChecked);
+            $(element).toggleClass("active", !isChecked);
+            updateSelectedLanguageBadges();
+        }
+
+        $(document).ready(function () {
+            updateSelectedBadges();
+            updateSelectedLanguageBadges();
+
+            $('#sportSearch').on('input', function () {
+                const search = $(this).val().toLowerCase();
+                $('#sportList .sport-checkbox').each(function () {
+                    const name = $(this).data('name');
+                    $(this).toggle(name.includes(search));
+                });
+            });
+
+            $('#languageSearch').on('input', function () {
+                const search = $(this).val().toLowerCase();
+                $('#languageList .sport-checkbox').each(function () {
+                    const name = $(this).data('name');
+                    $(this).toggle(name.includes(search));
+                });
             });
         });
-    });
 
-
-    function updateSelectedLanguageBadges() {
-        const container = $('#selectedLanguageBadges');
-        container.empty();
-        $('#languageList input[type="checkbox"]:checked').each(function () {
-            const id = $(this).val();
-            const label = $(this).closest('.sport-checkbox').find('label').text();
-            const badge = $(`<span class="badge badge-danger sport-tag mr-1 mb-1" data-id="${id}">${label}
-                    <button type="button" class="close ml-1" style="font-size:1rem;" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button></span>`);
-            badge.find('button').on('click', function () {
-                const box = $(`#languageList input[value="${id}"]`);
-                box.prop('checked', false);
-                box.closest('.sport-checkbox').removeClass('active');
-                updateSelectedLanguageBadges();
-            });
-            container.append(badge);
+        document.getElementById("profileImageUpload").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.querySelector(".profile-image img");
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         });
-    }
 
-    function toggleLanguageCheckbox(element) {
-        const checkbox = $(element).find('input[type="checkbox"]');
-        const isChecked = checkbox.prop("checked");
-        checkbox.prop("checked", !isChecked);
-        $(element).toggleClass("active", !isChecked);
-        updateSelectedLanguageBadges();
-    }
-
-    $(document).ready(function () {
-        updateSelectedLanguageBadges();
-
-        $('#languageSearch').on('input', function () {
-            const search = $(this).val().toLowerCase();
-            $('#languageList .sport-checkbox').each(function () {
-                const name = $(this).data('name');
-                $(this).toggle(name.includes(search));
-            });
-        });
-    });
-
-</script>
+    </script>
+}

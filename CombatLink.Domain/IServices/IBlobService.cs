@@ -9,6 +9,6 @@ namespace CombatLink.Domain.IServices
 {
     public interface IBlobService
     {
-        Task<string> UploadImageAsync(IFormFile file, string fileName);
+        Task<string> UploadImageAsync(IFormFile file);
     }
 }

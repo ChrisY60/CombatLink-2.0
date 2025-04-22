@@ -44,10 +44,10 @@ namespace CombatLink.Application.Services
             }
             return null;
         }
-        public async Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience)
+        public async Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience, string? profilePictureUrl = null)
         {
-            Debug.WriteLine("Got here 2");
-            return await _userRepository.UpdateUserProfile(userId, firstName, lastName, dateOfBirth, weight, height, monthsOfExperience);
+            string? a = profilePictureUrl;
+            return await _userRepository.UpdateUserProfile(userId, firstName, lastName, dateOfBirth, weight, height, monthsOfExperience, profilePictureUrl);
         }
 
         public async Task<User?> GetUserById(int userId)

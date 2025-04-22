@@ -14,6 +14,7 @@ namespace CombatLink.Application.ViewModels
         public List<int> SelectedLanguageIds { get; set; } = new();
         public List<Sport> AvailableSports { get; set; } = new();
         public List<Language> AvailableLanguages { get; set; } = new();
+        public string? ProfilePictureURL { get; set; }
 
 
     }

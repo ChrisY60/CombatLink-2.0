@@ -21,9 +21,10 @@ namespace CombatLink.Web.Controllers
         private readonly IUserPreferenceService _userPreferenceService;
         private readonly IMatchmakingService _matchmakingService;
         private readonly IAuthService _authService;
+        private readonly IBlobService _blobService;
 
 
-        public UserController(IUserService userService, ISportService sportsService, ILanguageService languageService, IUserPreferenceService userPreferenceService, IMatchmakingService matchmakingService, IAuthService authService)
+        public UserController(IUserService userService, ISportService sportsService, ILanguageService languageService, IUserPreferenceService userPreferenceService, IMatchmakingService matchmakingService, IAuthService authService, IBlobService blobService)
         {
             _sportsService = sportsService;
             _userService = userService;
@@ -31,6 +32,7 @@ namespace CombatLink.Web.Controllers
             _userPreferenceService = userPreferenceService;
             _matchmakingService = matchmakingService;
             _authService = authService;
+            _blobService = blobService;
         }
 
 
@@ -106,7 +108,7 @@ namespace CombatLink.Web.Controllers
             List<Language> selectedLanguages = (List<Language>)await _languageService.GetLanguagesByUserIdAsync(userId);
             List<Sport> selectedSports = (List<Sport>)await _sportsService.GetSportsByUserIdAsync(userId);
 
-            UserProfileViewModel model = new UserProfileViewModel{FirstName = user.FirstName,LastName = user.LastName,DateOfBirth = user.DateOfBirth,Weight = user.Weight,Height = user.Height,MonthsOfExperience = user.MonthsOfExperience,AvailableSports = allSports,AvailableLanguages = allLanguages,SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList()};
+            UserProfileViewModel model = new UserProfileViewModel{FirstName = user.FirstName,LastName = user.LastName,DateOfBirth = user.DateOfBirth,Weight = user.Weight,Height = user.Height,MonthsOfExperience = user.MonthsOfExperience,AvailableSports = allSports,AvailableLanguages = allLanguages,SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList(), ProfilePictureURL = user.ProfilePictureURL};
 
             return View(model);
         }
@@ -121,21 +123,27 @@ namespace CombatLink.Web.Controllers
             }
 
             int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            string? profilePictureUrl = null;
 
-            bool isUpdated = await _userService.UpdateUserProfile(userId,model.FirstName,model.LastName,model.DateOfBirth,model.Weight,model.Height,model.MonthsOfExperience);
+            if (model.ProfilePicture != null)
+            {
+                profilePictureUrl = await _blobService.UploadImageAsync(model.ProfilePicture);
+            }
+
+            bool isUpdated = await _userService.UpdateUserProfile(userId, model.FirstName, model.LastName, model.DateOfBirth,model.Weight,model.Height,model.MonthsOfExperience,profilePictureUrl);
+
             bool sportsAdded = await _sportsService.AddSportsToUserAsync(userId, model.SelectedSportIds);
             bool languagesAdded = await _languageService.AddLanguagesToUserAsync(userId, model.SelectedLanguageIds);
 
             if (isUpdated && sportsAdded && languagesAdded)
             {
-                ViewBag.Message = "Profile updated successfully!";
                 return RedirectToAction("Index", "Home");
             }
 
             ModelState.AddModelError("", "Failed to update profile completely.");
             return View(model);
-
         }
+
 
         [HttpGet]
         public async Task<IActionResult> ManagePreference()

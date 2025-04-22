@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace CombatLink.Application.ViewModels
 {
@@ -24,7 +25,7 @@ namespace CombatLink.Application.ViewModels
 
         public List<int> SelectedSportIds { get; set; } = new List<int>();
         public List<int> SelectedLanguageIds { get; set; } = new List<int>();
-
+        public IFormFile? ProfilePicture { get; set; }
 
     }
 }

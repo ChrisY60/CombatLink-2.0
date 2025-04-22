@@ -21,7 +21,14 @@ else
             <div class="recommendation">
                 <div class="profile-card" style="--i:@counter">
                     <div class="profile-image">
-                        <img src="https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg" alt="Profile Picture">
+                        @if (!string.IsNullOrEmpty(user.ProfilePictureURL))
+                        {
+                            <img src="@user.ProfilePictureURL" alt="Profile Picture" class="w-100 h-100" />
+                        }
+                        else
+                        {
+                            <img src="https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg" />
+                        }
                     </div>
                     <div class="profile-bio">
                         <h2>@user.FirstName @user.LastName</h2>

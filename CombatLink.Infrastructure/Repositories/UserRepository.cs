@@ -60,11 +60,11 @@ namespace CombatLink.Infrastructure.Repositories
                 return null;
             }
         }
-        public async Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience)
+        public async Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience, string? profilePictureUrl = null)
         {
             string query = "UPDATE Users " +
                            "SET FirstName = @FirstName, LastName = @LastName, DateOfBirth = @DateOfBirth, " +
-                           "Weight = @Weight, Height = @Height, MonthsOfExperience = @MonthsOfExperience " +
+                           "Weight = @Weight, Height = @Height, MonthsOfExperience = @MonthsOfExperience, ProfilePictureURL = @ProfilePictureURL " +
                            "WHERE Id = @UserId";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -79,6 +79,8 @@ namespace CombatLink.Infrastructure.Repositories
                     command.Parameters.AddWithValue("@Weight", weight);
                     command.Parameters.AddWithValue("@Height", height);
                     command.Parameters.AddWithValue("@MonthsOfExperience", monthsOfExperience);
+                    command.Parameters.AddWithValue("@ProfilePictureURL", (object?)profilePictureUrl ?? DBNull.Value);
+
 
                     var result = await command.ExecuteNonQueryAsync();
                     return result > 0;
@@ -88,7 +90,7 @@ namespace CombatLink.Infrastructure.Repositories
 
         public async Task<User?> GetUserById(int userId)
         {
-            string query = "SELECT Id, FirstName, LastName, DateOfBirth, Weight, Height, MonthsOfExperience FROM Users WHERE Id = @UserId";
+            string query = "SELECT Id, FirstName, LastName, DateOfBirth, Weight, Height, MonthsOfExperience, ProfilePictureURL FROM Users WHERE Id = @UserId";
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
@@ -109,7 +111,9 @@ namespace CombatLink.Infrastructure.Repositories
                                 DateOfBirth = reader["DateOfBirth"] as DateTime?,
                                 Weight = reader["Weight"] as decimal?,
                                 Height = reader["Height"] as decimal?,
-                                MonthsOfExperience = reader["MonthsOfExperience"] as int?
+                                MonthsOfExperience = reader["MonthsOfExperience"] as int?,
+                                ProfilePictureURL = reader["ProfilePictureURL"] as string
+
                             };
                         }
                     }
@@ -208,7 +212,7 @@ namespace CombatLink.Infrastructure.Repositories
         }
         public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            string query = "SELECT Id, Email, FirstName, LastName, DateOfBirth, Weight, Height, MonthsOfExperience FROM Users";
+            string query = "SELECT Id, Email, FirstName, LastName, DateOfBirth, Weight, Height, MonthsOfExperience, ProfilePictureURL FROM Users";
             var users = new List<User>();
 
             using var connection = new SqlConnection(_connectionString);
@@ -228,7 +232,8 @@ namespace CombatLink.Infrastructure.Repositories
                     DateOfBirth = reader["DateOfBirth"] as DateTime?,
                     Weight = reader["Weight"] as decimal?,
                     Height = reader["Height"] as decimal?,
-                    MonthsOfExperience = reader["MonthsOfExperience"] as int?
+                    MonthsOfExperience = reader["MonthsOfExperience"] as int?,
+                    ProfilePictureURL = reader["ProfilePictureURL"] as string
                 };
 
                 users.Add(user);

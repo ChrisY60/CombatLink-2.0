@@ -9,7 +9,7 @@ namespace CombatLink.Domain.IRepositories
 
         public Task<string?> GetPasswordHashByEmail(string email);
 
-        public Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience);
+        public Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience, string? profilePictureUrl = null);
 
         public Task<User?> GetUserById(int userId);
 
