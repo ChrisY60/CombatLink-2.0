@@ -131,7 +131,6 @@ namespace CombatLink.Web.Controllers
             }
 
             bool isUpdated = await _userService.UpdateUserProfile(userId, model.FirstName, model.LastName, model.DateOfBirth,model.Weight,model.Height,model.MonthsOfExperience,profilePictureUrl);
-
             bool sportsAdded = await _sportsService.AddSportsToUserAsync(userId, model.SelectedSportIds);
             bool languagesAdded = await _languageService.AddLanguagesToUserAsync(userId, model.SelectedLanguageIds);
 

@@ -3,14 +3,8 @@ using Azure.Storage.Blobs.Models;
 using CombatLink.Domain.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CombatLink.Application.Services
+namespace CombatLink.Infrastructure.BlobStorage
 {
     public class BlobService : IBlobService
     {
@@ -27,7 +21,7 @@ namespace CombatLink.Application.Services
         {
             if (file == null || file.Length == 0)
             {
-                throw new ArgumentException("Invalid image file.");
+                throw new ArgumentException("File does not exist or is empty.");
             }
 
             string extension = Path.GetExtension(file.FileName);

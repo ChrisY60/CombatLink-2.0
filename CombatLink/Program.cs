@@ -5,6 +5,7 @@ using CombatLink.Domain.IRepositories;
 using CombatLink.Domain.IServices;
 using CombatLink.Application.Services;
 using CombatLink.Web.Authentication;
+using CombatLink.Infrastructure.BlobStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
