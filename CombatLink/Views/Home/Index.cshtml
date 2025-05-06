@@ -4,6 +4,8 @@
 }
 <script src="~/js/swiper.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 @if (Model?.Users == null || Model.Users.Count == 0)
 {
     <p> No users with this criteria available :(</p>
@@ -96,6 +98,16 @@ else
                     .then(response => response.text())
                     .then(text => {
                         console.log("Response: ", text);
+                        if (text.trim() === "MATCH!") {
+                            Swal.fire({
+                                title: "Match!",
+                                text: "You and this user liked each other.",
+                                icon: "success",
+                                confirmButtonText: "Awesome!"
+                            });
+                        }
+
+
                     })
                     .catch(error => {
                         console.error("Failed to like user", error);

@@ -15,13 +15,18 @@ namespace CombatLink.Application.Services
         private readonly IUserPreferenceRepository _userPreferenceRepository;
         private readonly ISportRepository _sportRepository;
         private readonly ILanguageRepository _languageRepository;
+        private readonly ILikeRepository _likeRepository;
+        private readonly IMatchRepository _matchRepository;
 
-        public MatchmakingService(IUserRepository userRepository, IUserPreferenceRepository userPreferenceRepository, ISportRepository sportRepository, ILanguageRepository languageRepository)
+
+        public MatchmakingService(IUserRepository userRepository, IUserPreferenceRepository userPreferenceRepository, ISportRepository sportRepository, ILanguageRepository languageRepository, ILikeRepository likeRepository, IMatchRepository matchRepository)
         {
             _userRepository = userRepository;
             _userPreferenceRepository = userPreferenceRepository;
             _sportRepository = sportRepository;
             _languageRepository = languageRepository;
+            _likeRepository = likeRepository;
+            _matchRepository = matchRepository;
         }
 
         public async Task<List<User>> GetRecommendedUsersForUserIdAsync(int userId)
@@ -40,12 +45,32 @@ namespace CombatLink.Application.Services
 
             List<User> allUsers = (List<User>)await _userRepository.GetAllUsersAsync();
 
+            var likedUserIds = (await _likeRepository.GetLikesByUserId(userId))
+                               .Select(l => l.LikedUserId)
+                               .ToHashSet();
+
+            var matches = (await _matchRepository.GetMatchesByUserId(userId));
+            var matchedUserIds = matches
+                                 .Select(m => m.User1Id == userId ? m.User2Id : m.User1Id)
+                                 .ToHashSet();
+
+
             foreach (User user in allUsers)
             {
                 if(user.Id == userId)
                 {
                     continue;
                 }
+                if (likedUserIds.Contains(user.Id))
+                {
+                    continue;
+                }
+
+                if (matchedUserIds.Contains(user.Id))
+                {
+                    continue;
+                }
+
                 user.Sports = (await _sportRepository.GetSportsByUserId(user.Id)).ToList();
                 user.Languages = (await _languageRepository.GetLanguagesByUserId(user.Id)).ToList();
 
