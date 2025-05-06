@@ -34,6 +34,11 @@ builder.Services.AddScoped<ISportRepository>(provider =>
 builder.Services.AddScoped<ILanguageRepository>(provider =>
     new LanguageRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<ILikeRepository>(provider =>
+    new LikeRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IMatchRepository>(provider =>
+    new MatchRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISportService, SportService>();
@@ -43,6 +48,8 @@ builder.Services.AddScoped<IUserPreferenceService, UserPreferenceService>();
 builder.Services.AddScoped<IMatchmakingService, MatchmakingService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBlobService, BlobService>();
+builder.Services.AddScoped<ILikeService, LikeService>();
+builder.Services.AddScoped<IMatchService, MatchService>();
 
 
 var app = builder.Build();

@@ -18,7 +18,7 @@ else
         {
             counter++;
 
-            <div class="recommendation">
+            <div class="recommendation" data-user-id="@user.Id">
                 <div class="profile-card" style="--i:@counter">
                     <div class="profile-image">
                         @if (!string.IsNullOrEmpty(user.ProfilePictureURL))
@@ -75,17 +75,33 @@ else
             hammer.on("panend", function (event) {
                 if (event.deltaX > 200) {
                     recommendation.style.transform = "translateX(100vw) rotate(20deg)";
-                    removeRecommendation(recommendation);
+                    removeRecommendation(recommendation, true);
                 } else if (event.deltaX < -200) {
                     recommendation.style.transform = "translateX(-100vw) rotate(-20deg)";
-                    removeRecommendation(recommendation);
+                    removeRecommendation(recommendation, false);
                 } else {
                     recommendation.style.transform = "";
                 }
             });
         }
 
-        function removeRecommendation(recommendation) {
+        function removeRecommendation(recommendation, liked) {
+            if (liked) {
+                const likedUserId = recommendation.getAttribute("data-user-id");
+
+                fetch('/Matchmaking/Like?userId=' + likedUserId, {
+                    method: 'POST',
+                    credentials: 'include'
+                })
+                    .then(response => response.text())
+                    .then(text => {
+                        console.log("Response: ", text);
+                    })
+                    .catch(error => {
+                        console.error("Failed to like user", error);
+                    });
+            }
+
             setTimeout(() => {
                 recommendation.remove();
                 currentIndex--;
