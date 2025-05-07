@@ -1,0 +1,52 @@
+﻿@model CombatLink.Application.ViewModels.MatchChatViewModel
+
+<div class="">
+    <!-- Top Matches -->
+    <div class="top-matches">
+        @if (Model.MatchedUsers != null && Model.MatchedUsers.Any())
+        {
+            @foreach (var user in Model.MatchedUsers)
+            {
+                <div class="match">
+                    <img src="@(!string.IsNullOrEmpty(user.ProfilePictureURL) ? user.ProfilePictureURL : "https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg")" />
+                    <span class="status"></span>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-message">You don't have any matches yet 😢</div>
+        }
+    </div>
+
+    <!-- Search bar -->
+    <div class="chat-search">
+        <input type="text" placeholder="Search chats..." />
+    </div>
+
+    <!-- Chat List -->
+    <div class="chat-list">
+        @if (Model.Chats != null && Model.Chats.Any())
+        {
+            @foreach (var chat in Model.Chats)
+            {
+                <div class="chat-item">
+                    <img src="@(!string.IsNullOrEmpty(chat.User.ProfilePictureURL) ? chat.User.ProfilePictureURL : "https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg")" />
+                    <div class="chat-info">
+                        <h4>@chat.User.FirstName @chat.User.LastName</h4>
+                        <p>@chat.LastMessage</p>
+                    </div>
+                    @if (chat.UnreadCount > 0)
+                    {
+                        <div class="unread-count">@chat.UnreadCount</div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-message">No chats available yet, start a conversation!</div>
+        }
+    </div>
+</div>
+
