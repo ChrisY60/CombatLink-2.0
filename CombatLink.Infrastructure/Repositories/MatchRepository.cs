@@ -39,7 +39,7 @@ namespace CombatLink.Infrastructure.Repositories
         {
             List<Match> matches = new List<Match>();
 
-            string query = @"SELECT User1Id, User2Id, TimeOfMatch
+            string query = @"SELECT Id, User1Id, User2Id, TimeOfMatch
                              FROM Matches
                              WHERE User1Id = @UserId OR User2Id = @UserId";
 
@@ -54,9 +54,10 @@ namespace CombatLink.Infrastructure.Repositories
             {
                 matches.Add(new Match
                 {
-                    User1Id = reader.GetInt32(0),
-                    User2Id = reader.GetInt32(1),
-                    TimeOfMatch = reader.GetDateTime(2)
+                    Id = reader.GetInt32(0),
+                    User1Id = reader.GetInt32(1),
+                    User2Id = reader.GetInt32(2),
+                    TimeOfMatch = reader.GetDateTime(3)
                 });
             }
 
