@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CombatLink.Application.ViewModels
+namespace CombatLink.Domain.Models
 {
     public class ChatSummary
     {

@@ -5,11 +5,13 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CombatLink.Web", "CombatLink\CombatLink.Web.csproj", "{73D0D938-D6C2-430E-98E9-23156CDD7FF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CombatLink.Domain", "CombatLink.Domain\CombatLink.Domain.csproj", "{14A8561C-6700-41C0-A6FB-874E82F35F8C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CombatLink.Domain", "CombatLink.Domain\CombatLink.Domain.csproj", "{14A8561C-6700-41C0-A6FB-874E82F35F8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CombatLink.Application", "CombatLink.Application\CombatLink.Application.csproj", "{EFB764CF-ABA3-473D-99E2-60D3B0E828A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CombatLink.Application", "CombatLink.Application\CombatLink.Application.csproj", "{EFB764CF-ABA3-473D-99E2-60D3B0E828A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CombatLink.Infrastructure", "CombatLink.Infrastructure\CombatLink.Infrastructure.csproj", "{7D68B5D6-F8B6-4616-B15C-5965C5E3C0BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CombatLink.Infrastructure", "CombatLink.Infrastructure\CombatLink.Infrastructure.csproj", "{7D68B5D6-F8B6-4616-B15C-5965C5E3C0BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CombatLink.Test", "CombatLink.Test\CombatLink.Test.csproj", "{D3055290-C330-4AA9-8E14-E28BE335593D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{7D68B5D6-F8B6-4616-B15C-5965C5E3C0BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D68B5D6-F8B6-4616-B15C-5965C5E3C0BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D68B5D6-F8B6-4616-B15C-5965C5E3C0BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3055290-C330-4AA9-8E14-E28BE335593D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3055290-C330-4AA9-8E14-E28BE335593D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3055290-C330-4AA9-8E14-E28BE335593D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3055290-C330-4AA9-8E14-E28BE335593D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
