@@ -9,8 +9,8 @@ namespace CombatLink.Domain.Models
     public class ChatMessage
     {
         public int Id { get; set; }
-        public int MatchId { get; set; }
-        public int SenderId { get; set; }
+        public Match RelatedMatch { get; set; }
+        public User Sender { get; set; }
 
         private string _messageContent = string.Empty;
         public string MessageContent

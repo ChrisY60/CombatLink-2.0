@@ -1,3 +1,4 @@
+using CombatLink.Application.Services;
 using CombatLink.Application.ViewModels;
 using CombatLink.Domain.IServices;
 using CombatLink.Domain.Models;
@@ -16,14 +17,16 @@ namespace CombatLink.Web.Controllers
         private readonly ILikeService _likeService;
         private readonly IMatchService _matchService;
         private readonly IUserService _userService;
+        private readonly IChatMessageService _chatMessageService;
 
-        public HomeController(ILogger<HomeController> logger, IMatchmakingService matchmakingService, ILikeService likeService, IMatchService matchService, IUserService userService)
+        public HomeController(ILogger<HomeController> logger, IMatchmakingService matchmakingService, ILikeService likeService, IMatchService matchService, IUserService userService, IChatMessageService chatMessageService)
         {
             _logger = logger;
             _matchmakingService = matchmakingService;
             _likeService = likeService;
             _matchService = matchService;
             _userService = userService;
+            _chatMessageService = chatMessageService;
         }
 
         public async Task<IActionResult> IndexAsync()
@@ -41,59 +44,47 @@ namespace CombatLink.Web.Controllers
             return View();
         }
 
+        public IActionResult Chat(int matchId)
+        {
+            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var model = new ChatViewModel
+            {
+                MatchId = matchId,
+                UserId = userId
+            };
+
+            return View(model);
+        }
+
+
         public async Task<IActionResult> MatchesAndChats()
         {
-            // Mock matched users
             int userId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            List<User> matchedUsers = new List<User>();
-            List<Match> matches = (List<Match>)await _matchService.GetUserMatches(userId);
-            if(matches.Any()){
-                foreach (Match match in matches)
+
+            var matches = (await _matchService.GetUserMatches(userId)).ToList();
+
+            var chats = (await _chatMessageService.GetChatSummariesForUserAsync(userId)).ToList();
+
+            foreach (var chat in chats)
+            {
+                if (chat.User != null && chat.User.FirstName == null)
                 {
-                    if (match.User1Id == userId) {
-                        User? userToAdd = await _userService.GetUserById(match.User2Id);
-                        if(userToAdd != null)
-                        {
-                            matchedUsers.Add(userToAdd);
-                        }
-                    }
-                    else
-                    {
-                        User? userToAdd = await _userService.GetUserById(match.User1Id);
-                        if (userToAdd != null)
-                        {
-                            matchedUsers.Add(userToAdd);
-                        }
-                    }
+                    var fullUser = await _userService.GetUserById(chat.User.Id);
+                    if (fullUser != null)
+                        chat.User = fullUser;
                 }
             }
-            
-                
-            // Mock chats
-            var chats = new List<ChatSummary>
-            {
-                new ChatSummary
-                {
-                    User = new User { Id = 1, FirstName = "Fighter", LastName = "One", ProfilePictureURL = "" },
-                    LastMessage = "Hello, I will be able to train later today.",
-                    UnreadCount = 3
-                },
-                new ChatSummary
-                {
-                    User = new User { Id = 2, FirstName = "Fighter", LastName = "Two", ProfilePictureURL = "" },
-                    LastMessage = "See you tomorrow in the gym!",
-                    UnreadCount = 0
-                }
-            };
 
             var viewModel = new MatchChatViewModel
             {
-                MatchedUsers = matchedUsers,
+                Matches = matches,
                 Chats = chats
             };
 
             return View(viewModel);
         }
+
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -108,31 +108,59 @@ namespace CombatLink.Web.Controllers
             List<Language> selectedLanguages = (List<Language>)await _languageService.GetLanguagesByUserIdAsync(userId);
             List<Sport> selectedSports = (List<Sport>)await _sportsService.GetSportsByUserIdAsync(userId);
 
-            UserProfileViewModel model = new UserProfileViewModel{FirstName = user.FirstName,LastName = user.LastName,DateOfBirth = user.DateOfBirth,Weight = user.Weight,Height = user.Height,MonthsOfExperience = user.MonthsOfExperience,AvailableSports = allSports,AvailableLanguages = allLanguages,SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList(), ProfilePictureURL = user.ProfilePictureURL};
+            var viewModel = new UserProfileViewModel
+            {
+                ProfilePictureURL = user.ProfilePictureURL,
+                AvailableSports = allSports,
+                AvailableLanguages = allLanguages,
+                Form = new UpdateUserProfileManagementViewModel
+                {
+                    FirstName = user.FirstName ?? "",
+                    LastName = user.LastName ?? "",
+                    DateOfBirth = user.DateOfBirth ?? DateTime.Today,
+                    Weight = user.Weight ?? 0,
+                    Height = user.Height ?? 0,
+                    MonthsOfExperience = user.MonthsOfExperience ?? 0,
+                    SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),
+                    SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList()
+                }
+            };
 
-            return View(model);
+            return View(viewModel);
         }
 
 
+
         [HttpPost]
-        public async Task<IActionResult> ManageProfile(UpdateUserProfileManagementViewModel model)
+        public async Task<IActionResult> ManageProfile(UserProfileViewModel model)
         {
             if (!ModelState.IsValid)
             {
+                model.AvailableSports = (List<Sport>)await _sportsService.GetAllSportsAsync();
+                model.AvailableLanguages = (List<Language>)await _languageService.GetAllLanguagesAsync();
                 return View(model);
             }
 
             int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             string? profilePictureUrl = null;
 
-            if (model.ProfilePicture != null)
+            if (model.Form.ProfilePicture != null)
             {
-                profilePictureUrl = await _blobService.UploadImageAsync(model.ProfilePicture);
+                profilePictureUrl = await _blobService.UploadImageAsync(model.Form.ProfilePicture);
             }
 
-            bool isUpdated = await _userService.UpdateUserProfile(userId, model.FirstName, model.LastName, model.DateOfBirth,model.Weight,model.Height,model.MonthsOfExperience,profilePictureUrl);
-            bool sportsAdded = await _sportsService.AddSportsToUserAsync(userId, model.SelectedSportIds);
-            bool languagesAdded = await _languageService.AddLanguagesToUserAsync(userId, model.SelectedLanguageIds);
+            bool isUpdated = await _userService.UpdateUserProfile(
+                userId,
+                model.Form.FirstName,
+                model.Form.LastName,
+                model.Form.DateOfBirth,
+                model.Form.Weight,
+                model.Form.Height,
+                model.Form.MonthsOfExperience,
+                profilePictureUrl);
+
+            bool sportsAdded = await _sportsService.AddSportsToUserAsync(userId, model.Form.SelectedSportIds);
+            bool languagesAdded = await _languageService.AddLanguagesToUserAsync(userId, model.Form.SelectedLanguageIds);
 
             if (isUpdated && sportsAdded && languagesAdded)
             {
@@ -140,8 +168,11 @@ namespace CombatLink.Web.Controllers
             }
 
             ModelState.AddModelError("", "Failed to update profile completely.");
+            model.AvailableSports = (List<Sport>)await _sportsService.GetAllSportsAsync();
+            model.AvailableLanguages = (List<Language>)await _languageService.GetAllLanguagesAsync();
             return View(model);
         }
+
 
 
         [HttpGet]

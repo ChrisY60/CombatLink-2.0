@@ -1,16 +1,25 @@
 ﻿@model CombatLink.Application.ViewModels.MatchChatViewModel
+@using System.Security.Claims
+
+@{
+    int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+}
 
 <div class="">
     <!-- Top Matches -->
     <div class="top-matches">
-        @if (Model.MatchedUsers != null && Model.MatchedUsers.Any())
+        @if (Model.Matches != null && Model.Matches.Any())
         {
-            @foreach (var user in Model.MatchedUsers)
+            foreach (var match in Model.Matches)
             {
-                <div class="match">
-                    <img src="@(!string.IsNullOrEmpty(user.ProfilePictureURL) ? user.ProfilePictureURL : "https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg")" />
-                    <span class="status"></span>
-                </div>
+                var otherUser = match.User1.Id == currentUserId ? match.User2 : match.User1;
+
+                <a href="/Home/Chat?matchId=@match.Id">
+                    <div class="match">
+                        <img src="@(!string.IsNullOrEmpty(otherUser.ProfilePictureURL) ? otherUser.ProfilePictureURL : "https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg")" />
+                        <span class="status"></span>
+                    </div>
+                </a>
             }
         }
         else
@@ -28,19 +37,21 @@
     <div class="chat-list">
         @if (Model.Chats != null && Model.Chats.Any())
         {
-            @foreach (var chat in Model.Chats)
+            foreach (var chat in Model.Chats)
             {
-                <div class="chat-item">
-                    <img src="@(!string.IsNullOrEmpty(chat.User.ProfilePictureURL) ? chat.User.ProfilePictureURL : "https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg")" />
-                    <div class="chat-info">
-                        <h4>@chat.User.FirstName @chat.User.LastName</h4>
-                        <p>@chat.LastMessage</p>
+                <a asp-controller="Home" asp-action="Chat" asp-route-matchId="@chat.MatchId" class="chat-link">
+                    <div class="chat-item">
+                        <img src="@(!string.IsNullOrEmpty(chat.User.ProfilePictureURL) ? chat.User.ProfilePictureURL : "https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg")" />
+                        <div class="chat-info">
+                            <h4>@chat.User.FirstName @chat.User.LastName</h4>
+                            <p>@chat.LastMessage</p>
+                        </div>
+                        @if (chat.UnreadCount > 0)
+                        {
+                            <div class="unread-count">@chat.UnreadCount</div>
+                        }
                     </div>
-                    @if (chat.UnreadCount > 0)
-                    {
-                        <div class="unread-count">@chat.UnreadCount</div>
-                    }
-                </div>
+                </a>
             }
         }
         else
@@ -49,4 +60,3 @@
         }
     </div>
 </div>
-

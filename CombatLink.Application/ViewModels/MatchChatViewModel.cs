@@ -9,7 +9,8 @@ namespace CombatLink.Application.ViewModels
 {
     public class MatchChatViewModel
     {
-        public List<User> MatchedUsers { get; set; }
+        public List<Match> Matches { get; set; }
         public List<ChatSummary> Chats { get; set; }
     }
+
 }

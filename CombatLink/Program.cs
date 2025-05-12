@@ -6,6 +6,7 @@ using CombatLink.Domain.IServices;
 using CombatLink.Application.Services;
 using CombatLink.Web.Authentication;
 using CombatLink.Infrastructure.BlobStorage;
+using CombatLink.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,9 @@ builder.Services.AddScoped<ILikeRepository>(provider =>
 builder.Services.AddScoped<IMatchRepository>(provider =>
     new MatchRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IChatMessageRepository>(provider =>
+    new ChatMessageRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISportService, SportService>();
 builder.Services.AddScoped<IPasswordHasher<Object>, PasswordHasher<Object>>();
@@ -50,7 +54,9 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBlobService, BlobService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IMatchService, MatchService>();
+builder.Services.AddScoped<IChatMessageService, ChatMessageService>();
 
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -73,5 +79,8 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

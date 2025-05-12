@@ -12,10 +12,12 @@ namespace CombatLink.Application.Services
     public class MatchService : IMatchService
     {
         private readonly IMatchRepository _matchRepository;
+        private readonly IUserRepository _userRepository;
 
-        public MatchService(IMatchRepository matchRepository)
+        public MatchService(IMatchRepository matchRepository, IUserRepository userRepository)
         {
             _matchRepository = matchRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<bool> CreateMatchIfNotExists(int user1Id, int user2Id)
@@ -31,12 +33,20 @@ namespace CombatLink.Application.Services
             };
 
             return await _matchRepository.AddMatch(match);
-
         }
 
         public async Task<IEnumerable<Match>> GetUserMatches(int userId)
         {
-            return await _matchRepository.GetMatchesByUserId(userId);
+            var matches = (await _matchRepository.GetMatchesByUserId(userId)).ToList();
+
+            foreach (var match in matches)
+            {
+                match.User1 = await _userRepository.GetUserById(match.User1Id);
+                match.User2 = await _userRepository.GetUserById(match.User2Id);
+            }
+
+            return matches;
         }
     }
+
 }

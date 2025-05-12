@@ -9,6 +9,7 @@ namespace CombatLink.Domain.Models
 {
     public class ChatSummary
     {
+        public int MatchId { get; set; }
         public User User { get; set; }
         public string LastMessage { get; set; }
         public int UnreadCount { get; set; }
