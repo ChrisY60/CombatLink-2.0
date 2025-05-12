@@ -82,5 +82,44 @@ namespace CombatLink.Tests.Services
 
             Assert.True(result);
         }
+
+        [Fact]
+        public async Task CreateOrUpdateAsync_ShouldThrow_WhenWeightMinGreaterThanMax()
+        {
+            var pref = new UserPreference
+            {
+                RelatedUser = new User { Id = 1 },
+                WeightMin = 100,
+                WeightMax = 90
+            };
+
+            await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateOrUpdateAsync(pref));
+        }
+
+        [Fact]
+        public async Task CreateOrUpdateAsync_ShouldThrow_WhenHeightMinGreaterThanMax()
+        {
+            var pref = new UserPreference
+            {
+                RelatedUser = new User { Id = 1 },
+                HeightMin = 200,
+                HeightMax = 150
+            };
+
+            await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateOrUpdateAsync(pref));
+        }
+
+        [Fact]
+        public async Task CreateOrUpdateAsync_ShouldThrow_WhenExperienceMinGreaterThanMax()
+        {
+            var pref = new UserPreference
+            {
+                RelatedUser = new User { Id = 1 },
+                ExperienceMin = 50,
+                ExperienceMax = 30
+            };
+
+            await Assert.ThrowsAsync<ArgumentException>(() => _service.CreateOrUpdateAsync(pref));
+        }
     }
 }

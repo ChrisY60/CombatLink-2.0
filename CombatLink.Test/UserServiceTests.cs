@@ -158,7 +158,7 @@ namespace CombatLink.Tests.Services
         public async Task UpdateUserProfile_ShouldThrowException_WhenExperienceTooHigh()
         {
             var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
-                _userService.UpdateUserProfile(1, "John", "Doe", DateTime.UtcNow, 80, 180, 481));
+                _userService.UpdateUserProfile(1, "John", "Doe", DateTime.UtcNow, 80, 180, 1001));
             Assert.Contains("Experience", ex.Message);
         }
 
