@@ -44,6 +44,8 @@
             <form asp-action="ManageProfile" method="post" enctype="multipart/form-data" class="profile-form">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+                <input type="hidden" asp-for="ProfilePictureURL" />
+
                 <div class="form-group">
                     <label asp-for="Form.ProfilePicture">Profile Picture</label>
                     <input asp-for="Form.ProfilePicture" type="file" id="profileImageUpload" accept="image/*" class="form-control" />

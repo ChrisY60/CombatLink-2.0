@@ -142,12 +142,13 @@ namespace CombatLink.Web.Controllers
             }
 
             int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            string? profilePictureUrl = null;
+            string? profilePictureUrl = model.ProfilePictureURL;
 
             if (model.Form.ProfilePicture != null)
             {
                 profilePictureUrl = await _blobService.UploadImageAsync(model.Form.ProfilePicture);
             }
+
 
             bool isUpdated = await _userService.UpdateUserProfile(
                 userId,

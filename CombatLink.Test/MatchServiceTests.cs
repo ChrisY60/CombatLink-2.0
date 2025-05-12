@@ -5,19 +5,21 @@ using CombatLink.Domain.Models;
 using CombatLink.Application.Services;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
-//Match is a keyword in moq so i have to specify that its the model
 namespace CombatLink.Tests.Services
 {
     public class MatchServiceTests
     {
         private readonly Mock<IMatchRepository> _matchRepositoryMock;
+        private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly MatchService _service;
 
         public MatchServiceTests()
         {
             _matchRepositoryMock = new Mock<IMatchRepository>();
-            _service = new MatchService(_matchRepositoryMock.Object);
+            _userRepositoryMock = new Mock<IUserRepository>();
+            _service = new MatchService(_matchRepositoryMock.Object, _userRepositoryMock.Object);
         }
 
         [Fact]
@@ -44,7 +46,7 @@ namespace CombatLink.Tests.Services
         }
 
         [Fact]
-        public async Task GetUserMatches_ShouldReturnMatches()
+        public async Task GetUserMatches_ShouldReturnMatchesWithUsers()
         {
             var matches = new List<Domain.Models.Match>
             {
@@ -54,9 +56,17 @@ namespace CombatLink.Tests.Services
 
             _matchRepositoryMock.Setup(x => x.GetMatchesByUserId(1)).ReturnsAsync(matches);
 
+            _userRepositoryMock.Setup(x => x.GetUserById(It.IsAny<int>()))
+                .ReturnsAsync((int id) => new User { Id = id });
+
             var result = await _service.GetUserMatches(1);
 
             Assert.Equal(2, result.Count());
+            Assert.All(result, match =>
+            {
+                Assert.NotNull(match.User1);
+                Assert.NotNull(match.User2);
+            });
         }
     }
 }

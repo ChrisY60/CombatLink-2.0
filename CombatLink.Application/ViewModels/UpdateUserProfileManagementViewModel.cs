@@ -29,7 +29,7 @@ namespace CombatLink.Application.ViewModels
         public decimal Height { get; set; }
 
         [Required(ErrorMessage = "Experience is required.")]
-        [Range(0, 480, ErrorMessage = "Experience must be between 0 and 480 months.")]
+        [Range(0, 1000, ErrorMessage = "Experience must be between 0 and 480 months.")]
         public int MonthsOfExperience { get; set; }
 
         public List<int> SelectedSportIds { get; set; } = new();

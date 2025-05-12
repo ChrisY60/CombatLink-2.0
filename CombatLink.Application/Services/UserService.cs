@@ -46,9 +46,27 @@ namespace CombatLink.Application.Services
         }
         public async Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience, string? profilePictureUrl = null)
         {
-            string? a = profilePictureUrl;
+            if (string.IsNullOrWhiteSpace(firstName) || firstName.Length > 50)
+                throw new ArgumentException("First name is required and cannot exceed 50 characters.");
+
+            if (string.IsNullOrWhiteSpace(lastName) || lastName.Length > 50)
+                throw new ArgumentException("Last name is required and cannot exceed 50 characters.");
+
+            if (dateOfBirth > DateTime.UtcNow)
+                throw new ArgumentException("Date of birth cannot be in the future.");
+
+            if (weight < 30 || weight > 200)
+                throw new ArgumentException("Weight must be between 30 and 200 kg.");
+
+            if (height < 100 || height > 250)
+                throw new ArgumentException("Height must be between 100 and 250 cm.");
+
+            if (monthsOfExperience < 0 || monthsOfExperience > 1000)
+                throw new ArgumentException("Experience must be between 0 and 1000 months.");
+
             return await _userRepository.UpdateUserProfile(userId, firstName, lastName, dateOfBirth, weight, height, monthsOfExperience, profilePictureUrl);
         }
+
 
         public async Task<User?> GetUserById(int userId)
         {

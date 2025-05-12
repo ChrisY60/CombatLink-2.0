@@ -72,15 +72,96 @@ namespace CombatLink.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateUserProfile_ShouldReturnTrue_WhenUpdated()
+        public async Task UpdateUserProfile_ShouldThrowException_WhenFirstNameIsNull()
         {
-            _userRepoMock.Setup(x => x.UpdateUserProfile(1, "John", "Doe", It.IsAny<DateTime>(), 80, 195, 24, "url"))
-                .ReturnsAsync(true);
-
-            var result = await _userService.UpdateUserProfile(1, "John", "Doe", DateTime.UtcNow, 80, 195, 24, "url");
-
-            Assert.True(result);
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, null, "Doe", DateTime.UtcNow, 80, 180, 10));
+            Assert.Contains("First name", ex.Message);
         }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenFirstNameIsTooLong()
+        {
+            string longName = new string('A', 51);
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, longName, "Doe", DateTime.UtcNow, 80, 180, 10));
+            Assert.Contains("First name", ex.Message);
+        }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenLastNameIsEmpty()
+        {
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, "John", "", DateTime.UtcNow, 80, 180, 10));
+            Assert.Contains("Last name", ex.Message);
+        }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenLastNameIsTooLong()
+        {
+            string longName = new string('B', 60);
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, "John", longName, DateTime.UtcNow, 80, 180, 10));
+            Assert.Contains("Last name", ex.Message);
+        }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenDateOfBirthInFuture()
+        {
+            var futureDate = DateTime.UtcNow.AddDays(1);
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, "John", "Doe", futureDate, 80, 180, 10));
+            Assert.Contains("Date of birth", ex.Message);
+        }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenWeightTooLow()
+        {
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, "John", "Doe", DateTime.UtcNow, 29, 180, 10));
+            Assert.Contains("Weight", ex.Message);
+        }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenWeightTooHigh()
+        {
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, "John", "Doe", DateTime.UtcNow, 201, 180, 10));
+            Assert.Contains("Weight", ex.Message);
+        }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenHeightTooLow()
+        {
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, "John", "Doe", DateTime.UtcNow, 80, 99, 10));
+            Assert.Contains("Height", ex.Message);
+        }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenHeightTooHigh()
+        {
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, "John", "Doe", DateTime.UtcNow, 80, 251, 10));
+            Assert.Contains("Height", ex.Message);
+        }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenExperienceNegative()
+        {
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, "John", "Doe", DateTime.UtcNow, 80, 180, -1));
+            Assert.Contains("Experience", ex.Message);
+        }
+
+        [Fact]
+        public async Task UpdateUserProfile_ShouldThrowException_WhenExperienceTooHigh()
+        {
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() =>
+                _userService.UpdateUserProfile(1, "John", "Doe", DateTime.UtcNow, 80, 180, 481));
+            Assert.Contains("Experience", ex.Message);
+        }
+
 
         [Fact]
         public async Task GetUserById_ShouldReturnUser_WhenExists()
