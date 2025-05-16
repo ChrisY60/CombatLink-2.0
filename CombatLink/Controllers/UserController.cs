@@ -108,23 +108,7 @@ namespace CombatLink.Web.Controllers
             List<Language> selectedLanguages = (List<Language>)await _languageService.GetLanguagesByUserIdAsync(userId);
             List<Sport> selectedSports = (List<Sport>)await _sportsService.GetSportsByUserIdAsync(userId);
 
-            var viewModel = new UserProfileViewModel
-            {
-                ProfilePictureURL = user.ProfilePictureURL,
-                AvailableSports = allSports,
-                AvailableLanguages = allLanguages,
-                Form = new UpdateUserProfileManagementViewModel
-                {
-                    FirstName = user.FirstName ?? "",
-                    LastName = user.LastName ?? "",
-                    DateOfBirth = user.DateOfBirth ?? DateTime.Today,
-                    Weight = user.Weight ?? 0,
-                    Height = user.Height ?? 0,
-                    MonthsOfExperience = user.MonthsOfExperience ?? 0,
-                    SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),
-                    SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList()
-                }
-            };
+            var viewModel = new UserProfileViewModel{ProfilePictureURL = user.ProfilePictureURL,AvailableSports = allSports,AvailableLanguages = allLanguages,Form = new UpdateUserProfileManagementViewModel{FirstName = user.FirstName ?? "",LastName = user.LastName ?? "",DateOfBirth = user.DateOfBirth ?? DateTime.Today,Weight = user.Weight ?? 0,Height = user.Height ?? 0,MonthsOfExperience = user.MonthsOfExperience ?? 0,SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList()}};
 
             return View(viewModel);
         }
@@ -140,26 +124,14 @@ namespace CombatLink.Web.Controllers
                 model.AvailableLanguages = (List<Language>)await _languageService.GetAllLanguagesAsync();
                 return View(model);
             }
-
             int userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
             string? profilePictureUrl = model.ProfilePictureURL;
-
             if (model.Form.ProfilePicture != null)
             {
                 profilePictureUrl = await _blobService.UploadImageAsync(model.Form.ProfilePicture);
             }
 
-
-            bool isUpdated = await _userService.UpdateUserProfile(
-                userId,
-                model.Form.FirstName,
-                model.Form.LastName,
-                model.Form.DateOfBirth,
-                model.Form.Weight,
-                model.Form.Height,
-                model.Form.MonthsOfExperience,
-                profilePictureUrl);
-
+            bool isUpdated = await _userService.UpdateUserProfile(userId, model.Form.FirstName, model.Form.LastName, model.Form.DateOfBirth, model.Form.Weight, model.Form.Height, model.Form.MonthsOfExperience, profilePictureUrl);
             bool sportsAdded = await _sportsService.AddSportsToUserAsync(userId, model.Form.SelectedSportIds);
             bool languagesAdded = await _languageService.AddLanguagesToUserAsync(userId, model.Form.SelectedLanguageIds);
 

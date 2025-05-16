@@ -1,28 +1,32 @@
-﻿<div class="container">
-    <div class="row p-1">
-        <div class="col-1">User</div>
-        <div class="col-5"><input type="text" id="userInput" /></div>
-    </div>
-    <div class="row p-1">
-        <div class="col-1">Message</div>
-        <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
-    </div>
-    <div class="row p-1">
-        <div class="col-6 text-end">
-            <input type="button" id="sendButton" value="Send Message" />
+﻿@model CombatLink.Application.ViewModels.ChatViewModel
+
+<div class="chat-container">
+    <div class="chat-header">
+        <button id="backButton">←</button>
+        <div class="user-info">
+            <img src="/images/fighter1.png" alt="Avatar" class="avatar" />
+            <div>
+                <div class="username">Fighter 1</div>
+                <div class="status">online</div>
+            </div>
         </div>
     </div>
-    <div class="row p-1">
-        <div class="col-6">
-            <hr />
-        </div>
+
+    <div id="chatBox" class="chat-box">
     </div>
-    <div class="row p-1">
-        <div class="col-6">
-            <ul id="messagesList"></ul>
-        </div>
+
+    <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Type here..." />
+        <button id="sendButton">➤</button>
     </div>
 </div>
+
+<script>
+    const matchId = @Model.MatchId;
+    const currentUserId = @Model.UserId;
+    console.log(matchId);
+    console.log(currentUserId);
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script type="module" src="~/js/ChatClient.js"></script>
 

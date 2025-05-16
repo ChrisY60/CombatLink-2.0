@@ -1,34 +1,36 @@
-﻿
-var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+﻿const connection = new signalR.HubConnectionBuilder()
+    .withUrl("/chatHub")
+    .build();
 
-//Disable the send button until connection is established.
 document.getElementById("sendButton").disabled = true;
 
-connection.on("ReceiveMessage", function (user, message) {
-    var li = document.createElement("li");
-    document.getElementById("messagesList").appendChild(li);
-    // We can assign user-supplied strings to an element's textContent because it
-    // is not interpreted as markup. If you're assigning in any other way, you
-    // should be aware of possible script injection concerns.
-    li.textContent = `${user} says ${message}`;
-});
-
-connection.start().then(function () {
-    document.getElementById("sendButton").disabled = false;
-}).catch(function (err) {
-    return console.error(err.toString());
-});
-
-document.getElementById("sendButton").addEventListener("click", async function (event) {
-    var user = document.getElementById("userInput").value;
-    var message = document.getElementById("messageInput").value;
-
-    if (connection.state == signalR.HubConnectionState.Connected) {
-        await connection.invoke("SendMessage", user, message).catch(function (err) {
-            return console.error(err.toString());
-        });
-    } else {
-        console.log("dick");
+connection.on("ReceiveMessage", function (sender, message) {
+    let isOwnerOfMessage = false;
+    if (sender.id == currentUserId) {
+        isOwnerOfMessage = true; 
     }
-    event.preventDefault();
+
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("chat-message", isOwnerOfMessage ? "sent" : "received");
+    msgDiv.textContent = message;
+    console.log(message);
+
+    const chatBox = document.getElementById("chatBox"); 
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+});
+
+connection.start().then(() => {
+    connection.invoke("JoinMatchGroup", matchId.toString()).catch(err => console.error(err.toString()));
+    document.getElementById("sendButton").disabled = false;
+
+    document.getElementById("sendButton").addEventListener("click", () => {
+        const input = document.getElementById("messageInput");
+        let message = input.value.trim();
+        if (message !== "") {
+            connection.invoke("SendMessageToMatch", matchId.toString(), currentUserId.toString(), message.toString())
+                .catch(err => console.error(err.toString()));
+            input.value = "";
+        }
+    });
 });
