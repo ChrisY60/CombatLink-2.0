@@ -503,7 +503,7 @@ body {
 
 .sent {
     align-self: flex-end;
-    background-color: #d1f0d1;
+    background-color: #ffbabe;
 }
 
 .received {
@@ -531,7 +531,7 @@ body {
     font-size: 16px;
     border: none;
     border-radius: 20px;
-    background-color: #4CAF50;
+    background-color: #ff4f58;
     color: white;
     cursor: pointer;
 }
@@ -539,4 +539,11 @@ body {
     #sendButton:disabled {
         background-color: #9E9E9E;
     }
+
+.message-meta {
+    font-size: 0.75rem;
+    color: gray;
+    text-align: right;
+    margin-top: 4px;
+}
 

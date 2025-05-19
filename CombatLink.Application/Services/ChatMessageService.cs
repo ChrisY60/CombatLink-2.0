@@ -42,5 +42,10 @@ namespace CombatLink.Application.Services
         {
             return await _chatRepository.GetChatSummariesForUserAsync(userId);
         }
+
+        public async Task<IEnumerable<ChatMessage>> GetMessagesForMatchId(int matchId)
+        {
+            return await _chatRepository.GetMessagesForMatchIdAsync(matchId);
+        }
     }
 }

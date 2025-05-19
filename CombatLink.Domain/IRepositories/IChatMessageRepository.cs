@@ -13,6 +13,7 @@ namespace CombatLink.Domain.IRepositories
         Task<bool> SendMessageAsync(ChatMessage message);
         Task<bool> DeleteMessageAsync(int messageId);
         Task<IEnumerable<ChatMessage>> GetMessagesBetweenUsersAsync(int userId1, int userId2);
+        Task<IEnumerable<ChatMessage>> GetMessagesForMatchIdAsync(int matchId);
         Task<IEnumerable<ChatMessage>> GetMessagesForUserAsync(int userId);
         Task<ChatMessage?> GetMessageByIdAsync(int messageId);
         Task<IEnumerable<ChatSummary>> GetChatSummariesForUserAsync(int userId);

@@ -13,6 +13,16 @@
     </div>
 
     <div id="chatBox" class="chat-box">
+        @foreach (var msg in Model.Messages)
+        {
+            var isMine = msg.Sender?.Id == Model.UserId;
+            <div class="chat-message @(isMine ? "sent" : "received")">
+                <div class="bubble">
+                    @msg.MessageContent
+                    <div class="message-meta">@msg.TimeSent.ToShortTimeString()</div>
+                </div>
+            </div>
+        }
     </div>
 
     <div class="chat-input">

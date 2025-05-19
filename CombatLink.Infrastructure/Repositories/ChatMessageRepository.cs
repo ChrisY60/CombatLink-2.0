@@ -190,5 +190,39 @@ namespace CombatLink.Infrastructure.Repositories
 
             return summaries;
         }
+
+        public async Task<IEnumerable<ChatMessage>> GetMessagesForMatchIdAsync(int matchId)
+        {
+            var messages = new List<ChatMessage>();
+
+            string query = @"
+                SELECT Id, MatchId, SenderId, MessageContent, TimeSent, SeenByReceiver
+                FROM ChatMessages
+                WHERE MatchId = @MatchId
+                ORDER BY TimeSent";
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@MatchId", matchId);
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                messages.Add(new ChatMessage
+                {
+                    Id = reader.GetInt32(0),
+                    RelatedMatch = new Match { Id = reader.GetInt32(1) },
+                    Sender = new User { Id = reader.GetInt32(2) },
+                    MessageContent = reader.GetString(3),
+                    TimeSent = reader.GetDateTime(4),
+                    SeenByReceiver = reader.GetBoolean(5)
+                });
+            }
+
+            return messages;
+        }
+
     }
 }

@@ -44,14 +44,16 @@ namespace CombatLink.Web.Controllers
             return View();
         }
 
-        public IActionResult Chat(int matchId)
+        public async Task<IActionResult> ChatAsync(int matchId)
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            List<ChatMessage> messages = (List<ChatMessage>)await _chatMessageService.GetMessagesForMatchId(matchId);
 
             var model = new ChatViewModel
             {
                 MatchId = matchId,
-                UserId = userId
+                UserId = userId,
+                Messages = messages
             };
 
             return View(model);

@@ -1,10 +1,19 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using CombatLink.Domain.IServices;
+using CombatLink.Domain.Models;
+using Microsoft.AspNetCore.SignalR;
 using System.Diagnostics;
 
 namespace CombatLink.Web.Hubs
 {
     public class ChatHub : Hub
     {
+        private readonly IChatMessageService _chatMessageService;
+
+        public ChatHub(IChatMessageService chatMessageService)
+        {
+            _chatMessageService = chatMessageService;
+        }
+
         public override async Task OnConnectedAsync()
         {
             Debug.WriteLine($"Client connected: {Context.ConnectionId}");
@@ -18,14 +27,19 @@ namespace CombatLink.Web.Hubs
             {
                 id = senderId
             };
-
-            await Clients.Group(matchId).SendAsync("ReceiveMessage", sender, message);
-            Console.WriteLine("here");
+            ChatMessage messageObj = new ChatMessage
+            {
+                RelatedMatch = new Match { Id = int.Parse(matchId) },
+                Sender = new User { Id = int.Parse(senderId) },
+                MessageContent = message,
+                TimeSent = DateTime.UtcNow
+            };
+            await _chatMessageService.SendMessageAsync(messageObj);
+            await Clients.Group(matchId).SendAsync("ReceiveMessage", sender, message, DateTime.UtcNow.ToString("o"));
         }
 
         public async Task JoinMatchGroup(string matchId)
         {
-            Console.WriteLine("dickkk");
             try
             {
                 Console.WriteLine($"[JoinMatchGroup] Joining matchId: {matchId}, ConnectionId: {Context.ConnectionId}");
