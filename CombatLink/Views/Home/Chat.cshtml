@@ -1,5 +1,7 @@
 ﻿@model CombatLink.Application.ViewModels.ChatViewModel
-
+@{
+    DateTime? lastDate = null;
+}
 <div class="chat-container">
     <div class="chat-header">
         <button id="backButton">←</button>
@@ -16,19 +18,34 @@
         @foreach (var msg in Model.Messages)
         {
             var isMine = msg.Sender?.Id == Model.UserId;
+            var messageDate = msg.TimeSent.Date;
+
+            if (lastDate != messageDate)
+            {
+                <div class="date-separator">@messageDate.ToString("dd.MM.yyyy")</div>
+                lastDate = messageDate;
+            }
+
             <div class="chat-message @(isMine ? "sent" : "received")">
                 <div class="bubble">
                     @msg.MessageContent
                     <div class="message-meta">@msg.TimeSent.ToShortTimeString()</div>
                 </div>
             </div>
+
         }
     </div>
 
     <div class="chat-input">
         <input type="text" id="messageInput" placeholder="Type here..." />
-        <button id="sendButton">➤</button>
+        <button class="propose-button" title="Propose Sparring Session">
+            <img src="https://combatlinkblob.blob.core.windows.net/combatlink/propose_spar.png" alt="Propose" class="propose-icon" />
+        </button>
+        <button class="chatButton" id="sendButton">➤</button>
     </div>
+    
+    
+    
 </div>
 
 <script>

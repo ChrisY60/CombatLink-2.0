@@ -4,8 +4,27 @@
 
 document.getElementById("sendButton").disabled = true;
 
+let lastRenderedDate = null;
+
 connection.on("ReceiveMessage", function (sender, message, utcTimeString) {
     const isOwnerOfMessage = sender.id == currentUserId;
+
+    const localDate = new Date(utcTimeString);
+    const localDateString = localDate.toLocaleDateString('en-GB');
+
+    const chatBox = document.getElementById("chatBox");
+
+    if (lastRenderedDate !== localDateString) {
+        const dateDiv = document.createElement("div");
+        dateDiv.classList.add("date-separator");
+        dateDiv.textContent = localDate.toLocaleDateString('bg-BG', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        chatBox.appendChild(dateDiv);
+        lastRenderedDate = localDateString;
+    }
 
     const msgDiv = document.createElement("div");
     msgDiv.classList.add("chat-message", isOwnerOfMessage ? "sent" : "received");
@@ -18,9 +37,7 @@ connection.on("ReceiveMessage", function (sender, message, utcTimeString) {
 
     const timeDiv = document.createElement("div");
     timeDiv.classList.add("message-meta");
-
-    const localTime = new Date(utcTimeString);
-    timeDiv.textContent = localTime.toLocaleTimeString([], {
+    timeDiv.textContent = localDate.toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit'
     });
@@ -28,10 +45,10 @@ connection.on("ReceiveMessage", function (sender, message, utcTimeString) {
     bubble.appendChild(timeDiv);
     msgDiv.appendChild(bubble);
 
-    const chatBox = document.getElementById("chatBox");
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 });
+
 
 
 connection.start().then(() => {

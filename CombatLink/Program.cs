@@ -44,6 +44,9 @@ builder.Services.AddScoped<IMatchRepository>(provider =>
 builder.Services.AddScoped<IChatMessageRepository>(provider =>
     new ChatMessageRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<ISparringSessionProposalRepository>(provider =>
+    new SparringSessionProposalRepository(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISportService, SportService>();
 builder.Services.AddScoped<IPasswordHasher<Object>, PasswordHasher<Object>>();
@@ -55,6 +58,7 @@ builder.Services.AddScoped<IBlobService, BlobService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
 builder.Services.AddScoped<IMatchService, MatchService>();
 builder.Services.AddScoped<IChatMessageService, ChatMessageService>();
+builder.Services.AddScoped<ISparringSessionProposalService, SparringSessionProposalService>();
 
 builder.Services.AddSignalR();
 

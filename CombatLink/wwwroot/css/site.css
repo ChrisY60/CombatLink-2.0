@@ -526,7 +526,7 @@ body {
     margin-right: 10px;
 }
 
-#sendButton {
+.chatButton {
     padding: 10px 16px;
     font-size: 16px;
     border: none;
@@ -534,6 +534,7 @@ body {
     background-color: #ff4f58;
     color: white;
     cursor: pointer;
+    margin-right: 5px;
 }
 
     #sendButton:disabled {
@@ -546,4 +547,33 @@ body {
     text-align: right;
     margin-top: 4px;
 }
+
+.date-separator {
+    text-align: center;
+    margin: 20px 0 10px;
+    font-size: 0.85rem;
+    color: gray;
+    font-weight: 500;
+}
+.propose-button {
+    background: none;
+    border: none;
+    border-radius: 20px;
+    margin-right: 5px;
+    background-color: #ff4f58;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.propose-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
 
