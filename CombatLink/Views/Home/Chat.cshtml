@@ -2,6 +2,30 @@
 @{
     DateTime? lastDate = null;
 }
+
+<!-- jQuery (required for modal and Leaflet setup) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap (required for modal if not already in layout) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- SignalR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script type="module" src="~/js/ChatClient.js"></script>
+
+<!-- Leaflet & Geocoder -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<script>
+    const matchId = @Model.MatchId;
+    const currentUserId = @Model.UserId;
+    console.log("matchId:", matchId);
+    console.log("currentUserId:", currentUserId);
+</script>
+
 <div class="chat-container">
     <div class="chat-header">
         <button id="backButton">←</button>
@@ -32,28 +56,102 @@
                     <div class="message-meta">@msg.TimeSent.ToShortTimeString()</div>
                 </div>
             </div>
-
         }
     </div>
 
     <div class="chat-input">
         <input type="text" id="messageInput" placeholder="Type here..." />
-        <button class="propose-button" title="Propose Sparring Session">
+        <button class="propose-button" data-bs-toggle="modal" data-bs-target="#proposeModal" title="Propose Sparring Session">
             <img src="https://combatlinkblob.blob.core.windows.net/combatlink/propose_spar.png" alt="Propose" class="propose-icon" />
         </button>
         <button class="chatButton" id="sendButton">➤</button>
     </div>
-    
-    
-    
 </div>
 
-<script>
-    const matchId = @Model.MatchId;
-    const currentUserId = @Model.UserId;
-    console.log(matchId);
-    console.log(currentUserId);
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
-<script type="module" src="~/js/ChatClient.js"></script>
+<!-- Modal -->
+<div class="modal fade" id="proposeModal" tabindex="-1" aria-labelledby="proposeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="proposeForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="proposeModalLabel">Propose Sparring Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="sportId" class="form-label">Sport ID</label>
+                        <input type="number" class="form-control" id="sportId" name="sportId" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="sessionTime" class="form-label">Time of Session</label>
+                        <input type="datetime-local" class="form-control" id="sessionTime" name="sessionTime" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Location</label>
+                        <div id="map" style="height: 300px;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="latitude" class="form-label">Latitude</label>
+                        <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="longitude" class="form-label">Longitude</label>
+                        <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Send Proposal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
+<!-- Leaflet map init -->
+<script>
+    let map, marker;
+
+    $(document).ready(function () {
+        console.log("jQuery ready");
+
+        $('#proposeModal').on('shown.bs.modal', function () {
+            console.log("Modal shown");
+
+            if (!map) {
+                console.log("Initializing map");
+
+                map = L.map('map').setView([52.3676, 4.9041], 13); // Default to Amsterdam
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap'
+                }).addTo(map);
+
+                marker = L.marker([52.3676, 4.9041], { draggable: true }).addTo(map);
+
+                marker.on('dragend', function (e) {
+                    const position = marker.getLatLng();
+                    $('#latitude').val(position.lat.toFixed(6));
+                    $('#longitude').val(position.lng.toFixed(6));
+                });
+
+                L.Control.geocoder({
+                    defaultMarkGeocode: false
+                })
+                    .on('markgeocode', function (e) {
+                        const center = e.geocode.center;
+                        map.setView(center, 15);
+                        marker.setLatLng(center);
+                        $('#latitude').val(center.lat.toFixed(6));
+                        $('#longitude').val(center.lng.toFixed(6));
+                    })
+                    .addTo(map);
+            }
+
+            setTimeout(() => {
+                map.invalidateSize();
+                console.log("Map invalidated");
+            }, 500);
+        });
+    });
+</script>
