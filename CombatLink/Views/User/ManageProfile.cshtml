@@ -6,50 +6,63 @@
 }
 
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <div class="container mt-4 p-4 rounded-container shadow-lg secondary-background secondary-container-size">
     <h2 class="text-center">Profile Management</h2>
 
     <a asp-controller="User" asp-action="ManagePreference" class="btn btn-outline-danger w-100 mt-3 mb-3">
+        <i class="fas fa-handshake"></i>
         Manage Sparring Preferences
     </a>
 
     <div class="row profile-page-row">
+        <!-- Profile Card -->
         <div class="col-md-6 profile-col-wrapper">
             <div class="fixed-card-container">
                 <div class="profile-card profile-card-manage">
                     <div class="profile-image upload-wrapper position-relative">
-                        <label for="profileImageUpload" class="w-100 h-100 m-0 p-0 position-absolute top-0 start-0 z-2 upload-overlay d-flex justify-content-center align-items-center text-white">
-                            <span class="upload-text">Change Photo</span>
+                        <label for="profileImageUpload" class="w-100 h-100 m-0 p-0 position-absolute top-0 start-0 z-2 upload-overlay d-flex justify-content-center align-items-center text-white flex-column">
+                            <i class="fas fa-camera fa-2x"></i>
+                            <span class="upload-text d-block mt-2">Change Photo</span>
                         </label>
                         <img src="@(!string.IsNullOrEmpty(Model.ProfilePictureURL) ? Model.ProfilePictureURL : "https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg")" class="w-100 h-100" />
                     </div>
 
                     <div class="profile-bio">
                         <h2>@Model.Form.FirstName @Model.Form.LastName</h2>
-                        <p>@Model.Form.Weight Kg &nbsp;&nbsp; @Model.Form.Height Cm</p>
+                        <div class="d-flex justify-content-center gap-3 mb-2">
+                            <div><i class="fas fa-weight"></i> @Model.Form.Weight Kg</div>
+                            <div><i class="fas fa-ruler-vertical"></i> @Model.Form.Height Cm</div>
+                        </div>
                         <div class="tags">
                             @foreach (var sport in Model.AvailableSports.Take(3))
                             {
                                 <button class="tag">@sport.Name</button>
                             }
-                            <button class="tag more">more</button>
+                            @if (Model.AvailableSports.Count > 3)
+                            {
+                                <button class="tag more">+@((Model.AvailableSports.Count - 3)) more</button>
+                            }
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6 profile-form-wrapper" style="margin-top: 2vh">
+        <!-- Profile Form -->
+        <div class="col-md-6 profile-form-wrapper">
             <form asp-action="ManageProfile" method="post" enctype="multipart/form-data" class="profile-form">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                 <input type="hidden" asp-for="ProfilePictureURL" />
 
                 <div class="form-group">
-                    <label asp-for="Form.ProfilePicture">Profile Picture</label>
+                    <h5><i class="fas fa-camera mr-2"></i>Profile Picture</h5>
                     <input asp-for="Form.ProfilePicture" type="file" id="profileImageUpload" accept="image/*" class="form-control" />
                 </div>
+
+                <h5><i class="fas fa-id-card mr-2"></i>Basic Information</h5>
 
                 <div class="form-group">
                     <label asp-for="Form.FirstName"></label>
@@ -69,6 +82,8 @@
                     <span asp-validation-for="Form.DateOfBirth" class="text-danger"></span>
                 </div>
 
+                <h5><i class="fas fa-dumbbell mr-2"></i>Physical Stats</h5>
+
                 <div class="form-group">
                     <label asp-for="Form.Weight">Weight (kg)</label>
                     <input asp-for="Form.Weight" class="form-control" />
@@ -87,8 +102,9 @@
                     <span asp-validation-for="Form.MonthsOfExperience" class="text-danger"></span>
                 </div>
 
+                <h5><i class="fas fa-fist-raised mr-2"></i>Combat Sports</h5>
+
                 <div class="form-group">
-                    <label class="mb-1 font-weight-bold">Sports</label>
                     <div id="selectedBadges" class="mb-2"></div>
                     <div class="search-sport-container">
                         <input type="text" id="sportSearch" class="form-control search-bar" placeholder="Search sports..." />
@@ -107,8 +123,9 @@
                     </div>
                 </div>
 
+                <h5><i class="fas fa-language mr-2"></i>Languages</h5>
+
                 <div class="form-group">
-                    <label class="mb-1 font-weight-bold">Languages</label>
                     <div id="selectedLanguageBadges" class="mb-2"></div>
                     <div class="search-sport-container">
                         <input type="text" id="languageSearch" class="form-control search-bar" placeholder="Search languages..." />
