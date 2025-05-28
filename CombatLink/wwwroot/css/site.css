@@ -1,4 +1,4 @@
-
+﻿
 /* ========== GLOBAL TYPOGRAPHY ========== */
 html {
     font-size: 18px;
@@ -463,7 +463,7 @@ body {
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: 85vh;
+    height: 82vh;
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
@@ -522,7 +522,10 @@ body {
 .chat-input {
     display: flex;
     padding: 10px;
+    max-width: 900px;
+    width: 100%;
     background-color: #eee;
+    margin: 0 auto;
 }
 
 #messageInput {
@@ -583,5 +586,60 @@ body {
     height: 32px;
     object-fit: contain;
 }
+
+.proposal-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    width: 40%;
+    min-width:280px;
+    max-width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 240px;
+}
+
+
+.map-preview {
+    width: 100%;
+    min-height: 80px;
+    border-radius: 8px;
+    margin-bottom: 0px;
+    z-index: 2;
+}
+.hover-card {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5); /* dark transparent overlay */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 12px;
+    text-align: center;
+    padding: 1rem;
+    backdrop-filter: blur(2px);
+    z-index: 10; 
+}
+
+.hover-card:hover .hover-overlay {
+    opacity: 1;
+}
+
 
 

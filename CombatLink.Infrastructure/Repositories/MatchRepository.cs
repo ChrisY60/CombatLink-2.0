@@ -82,5 +82,31 @@ namespace CombatLink.Infrastructure.Repositories
             return count > 0;
         }
 
+        public async Task<Match?> GetMatchById(int matchId)
+        {
+            string query = @"SELECT Id, User1Id, User2Id, TimeOfMatch FROM Matches WHERE Id = @MatchId";
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@MatchId", matchId);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return new Match
+                {
+                    Id = reader.GetInt32(0),
+                    User1Id = reader.GetInt32(1),
+                    User2Id = reader.GetInt32(2),
+                    TimeOfMatch = reader.GetDateTime(3)
+                };
+            }
+
+            return null;
+        }
+
+
     }
 }

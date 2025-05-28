@@ -11,5 +11,7 @@ namespace CombatLink.Domain.IServices
     {
         Task<bool> CreateMatchIfNotExists(int user1Id, int user2Id);
         Task<IEnumerable<Match>> GetUserMatches(int userId);
+        Task<Match?> GetMatchById(int matchId);
+
     }
 }

@@ -149,5 +149,45 @@ namespace CombatLink.Infrastructure.Repositories
             return proposals;
         }
 
+        public async Task<IEnumerable<SparringSessionProposal>> GetByTwoUserIdsAsync(int userId1, int userId2)
+        {
+            var proposals = new List<SparringSessionProposal>();
+
+            const string query = @"
+                SELECT Id, ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, IsAccepted
+                FROM SparringSessionProposals
+                WHERE 
+                    (ChallengerUserId = @UserId1 AND ChallengedUserId = @UserId2)
+                    OR
+                    (ChallengerUserId = @UserId2 AND ChallengedUserId = @UserId1)
+                ORDER BY TimeProposed ASC";
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@UserId1", userId1);
+            command.Parameters.AddWithValue("@UserId2", userId2);
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                proposals.Add(new SparringSessionProposal
+                {
+                    Id = reader.GetInt32(0),
+                    ChallengerUserId = reader.GetInt32(1),
+                    ChallengedUserId = reader.GetInt32(2),
+                    TimeProposed = reader.GetDateTime(3),
+                    SportId = reader.GetInt32(4),
+                    Longtitude = reader.GetDecimal(5),
+                    Latitude = reader.GetDecimal(6),
+                    TimeOfSession = reader.GetDateTime(7),
+                    IsAccepted = reader.GetBoolean(8)
+                });
+            }
+
+            return proposals;
+        }
+
     }
 }

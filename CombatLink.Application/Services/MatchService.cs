@@ -47,6 +47,19 @@ namespace CombatLink.Application.Services
 
             return matches;
         }
+
+        public async Task<Match?> GetMatchById(int matchId)
+        {
+            var match = await _matchRepository.GetMatchById(matchId);
+            if (match != null)
+            {
+                match.User1 = await _userRepository.GetUserById(match.User1Id);
+                match.User2 = await _userRepository.GetUserById(match.User2Id);
+            }
+
+            return match;
+        }
+
     }
 
 }

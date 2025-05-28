@@ -3,27 +3,17 @@
     DateTime? lastDate = null;
 }
 
-<!-- jQuery (required for modal and Leaflet setup) -->
+<!-- Scripts & Styles -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Bootstrap (required for modal if not already in layout) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- SignalR -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script type="module" src="~/js/ChatClient.js"></script>
-
-<!-- Leaflet & Geocoder -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <script>
     const matchId = @Model.MatchId;
-    const currentUserId = @Model.UserId;
-    console.log("matchId:", matchId);
-    console.log("currentUserId:", currentUserId);
+    const currentUserId = @Model.CurrentUserId;
 </script>
 
 <div class="chat-container">
@@ -31,96 +21,107 @@
         <button id="backButton">←</button>
         <div class="user-info">
             <img src="/images/fighter1.png" alt="Avatar" class="avatar" />
-            <div>
-                <div class="username">Fighter 1</div>
-                <div class="status">online</div>
-            </div>
         </div>
     </div>
 
     <div id="chatBox" class="chat-box">
-        @foreach (var msg in Model.Messages)
+        @foreach (var item in Model.ChatItems)
         {
-            var isMine = msg.Sender?.Id == Model.UserId;
-            var messageDate = msg.TimeSent.Date;
+            var itemDate = item.Time.Date;
 
-            if (lastDate != messageDate)
+            if (lastDate != itemDate)
             {
-                <div class="date-separator">@messageDate.ToString("dd.MM.yyyy")</div>
-                lastDate = messageDate;
+                <div class="date-separator">@itemDate.ToString("dd.MM.yyyy")</div>
+                lastDate = itemDate;
             }
 
-            <div class="chat-message @(isMine ? "sent" : "received")">
-                <div class="bubble">
-                    @msg.MessageContent
-                    <div class="message-meta">@msg.TimeSent.ToShortTimeString()</div>
+            if (item.Message != null)
+            {
+                var isMine = item.Message.Sender?.Id == Model.CurrentUserId;
+                <div class="chat-message @(isMine ? "sent" : "received")">
+                    <div class="bubble">
+                        @item.Message.MessageContent
+                        <div class="message-meta">@item.Message.TimeSent.ToShortTimeString()</div>
+                    </div>
                 </div>
-            </div>
+            }
+
+            if (item.Proposal != null)
+            {
+                <div class="proposal-card hover-card">
+                    <div class="map-preview" id="map-@item.Proposal.Id"
+                         data-lat="@item.Proposal.Latitude"
+                         data-lng="@item.Proposal.Longtitude">
+                    </div>
+                    <div class="p-3">
+                        <div><strong>Date:</strong> @item.Proposal.TimeOfSession.ToString("dd.MM.yyyy")</div>
+                        <div><strong>Time:</strong> @item.Proposal.TimeOfSession.ToString("HH:mm")</div>
+                        <span class="badge bg-danger mt-2">
+                            @(string.IsNullOrWhiteSpace(item.Proposal.RelatedSport?.Name) ? "Unknown" : item.Proposal.RelatedSport.Name)
+                        </span>
+                        <div class="text-muted small mt-2 text-center">Click to view more information</div>
+                    </div>
+                    <div class="hover-overlay">
+                        <span>Click for more information</span>
+                    </div>
+                </div>
+            }
         }
     </div>
-
+</div>
     <div class="chat-input">
         <input type="text" id="messageInput" placeholder="Type here..." />
-        <button class="propose-button" data-bs-toggle="modal" data-bs-target="#proposeModal" title="Propose Sparring Session">
+        <button class="propose-button" data-bs-toggle="modal" data-bs-target="#proposeModal">
             <img src="https://combatlinkblob.blob.core.windows.net/combatlink/propose_spar.png" alt="Propose" class="propose-icon" />
         </button>
         <button class="chatButton" id="sendButton">➤</button>
     </div>
-</div>
 
-<!-- Modal -->
-<div class="modal fade" id="proposeModal" tabindex="-1" aria-labelledby="proposeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="proposeForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="proposeModalLabel">Propose Sparring Session</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="sportId" class="form-label">Sport ID</label>
-                        <input type="number" class="form-control" id="sportId" name="sportId" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="sessionTime" class="form-label">Time of Session</label>
-                        <input type="datetime-local" class="form-control" id="sessionTime" name="sessionTime" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Select Location</label>
-                        <div id="map" style="height: 300px;"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="latitude" class="form-label">Latitude</label>
-                        <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="longitude" class="form-label">Longitude</label>
-                        <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" required />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Send Proposal</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- Leaflet map init -->
+@await Html.PartialAsync("~/Views/Shared/_SparringProposalModal.cshtml", Model)
+
+<!-- JS to Init Proposal Map Previews -->
+<script>
+    function initializeMapPreview(el) {
+        const lat = parseFloat(el.dataset.lat);
+        const lng = parseFloat(el.dataset.lng);
+        const map = L.map(el, {
+            zoomControl: false,
+            attributionControl: false,
+            dragging: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            keyboard: false,
+            tap: false,
+            touchZoom: false
+        }).setView([lat, lng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+        }).addTo(map);
+
+        L.marker([lat, lng]).addTo(map);
+        setTimeout(() => map.invalidateSize(), 200);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Ensure rendering happens after layout
+        setTimeout(() => {
+            document.querySelectorAll('.map-preview').forEach(initializeMapPreview);
+        }, 300);
+    });
+</script>
+
+
+<!-- Modal Map Setup -->
 <script>
     let map, marker;
 
     $(document).ready(function () {
-        console.log("jQuery ready");
-
         $('#proposeModal').on('shown.bs.modal', function () {
-            console.log("Modal shown");
-
             if (!map) {
-                console.log("Initializing map");
-
-                map = L.map('map').setView([52.3676, 4.9041], 13); // Default to Amsterdam
+                map = L.map('map').setView([52.3676, 4.9041], 13);
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 19,
@@ -130,28 +131,55 @@
                 marker = L.marker([52.3676, 4.9041], { draggable: true }).addTo(map);
 
                 marker.on('dragend', function (e) {
-                    const position = marker.getLatLng();
-                    $('#latitude').val(position.lat.toFixed(6));
-                    $('#longitude').val(position.lng.toFixed(6));
+                    const pos = marker.getLatLng();
+                    $('#latitude').val(pos.lat.toFixed(6));
+                    $('#longitude').val(pos.lng.toFixed(6));
                 });
-
-                L.Control.geocoder({
-                    defaultMarkGeocode: false
-                })
-                    .on('markgeocode', function (e) {
-                        const center = e.geocode.center;
-                        map.setView(center, 15);
-                        marker.setLatLng(center);
-                        $('#latitude').val(center.lat.toFixed(6));
-                        $('#longitude').val(center.lng.toFixed(6));
-                    })
-                    .addTo(map);
             }
 
-            setTimeout(() => {
-                map.invalidateSize();
-                console.log("Map invalidated");
-            }, 500);
+            setTimeout(() => map.invalidateSize(), 500);
         });
     });
 </script>
+
+<!-- Proposal Submit -->
+<script>
+    document.getElementById('proposeForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const payload = {
+            challengerUserId: parseInt(document.getElementById('challengerUserId').value),
+            challengedUserId: parseInt(document.getElementById('challengedUserId').value),
+            sportId: parseInt(document.getElementById('sportId').value),
+            timeOfSession: document.getElementById('sessionTime').value,
+            latitude: parseFloat(document.getElementById('latitude').value),
+            longitude: parseFloat(document.getElementById('longitude').value)
+        };
+
+        try {
+            const response = await fetch('/Sparring/Propose', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert("Sparring proposal sent!");
+                $('#proposeModal').modal('hide');
+                document.getElementById('proposeForm').reset();
+            } else {
+                const error = await response.text();
+                alert("Error: " + error);
+            }
+        } catch (err) {
+            alert("Unexpected error: " + err);
+        }
+    });
+</script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const chatBox = document.getElementById("chatBox");
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    </script>

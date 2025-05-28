@@ -12,5 +12,7 @@ namespace CombatLink.Domain.IRepositories
         Task<bool> AddMatch(Match match);
         Task<IEnumerable<Match>> GetMatchesByUserId(int userId);
         Task<bool> MatchExists(int user1Id, int user2Id);
+        Task<Match?> GetMatchById(int matchId);
+
     }
 }

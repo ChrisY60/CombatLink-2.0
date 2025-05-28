@@ -18,8 +18,9 @@ namespace CombatLink.Web.Controllers
         private readonly IMatchService _matchService;
         private readonly IUserService _userService;
         private readonly IChatMessageService _chatMessageService;
+        private readonly ISparringSessionProposalService _sparringSessionProposalService;
 
-        public HomeController(ILogger<HomeController> logger, IMatchmakingService matchmakingService, ILikeService likeService, IMatchService matchService, IUserService userService, IChatMessageService chatMessageService)
+        public HomeController(ILogger<HomeController> logger, IMatchmakingService matchmakingService, ILikeService likeService, IMatchService matchService, IUserService userService, IChatMessageService chatMessageService, ISparringSessionProposalService sparringSessionProposalService)
         {
             _logger = logger;
             _matchmakingService = matchmakingService;
@@ -27,6 +28,7 @@ namespace CombatLink.Web.Controllers
             _matchService = matchService;
             _userService = userService;
             _chatMessageService = chatMessageService;
+            _sparringSessionProposalService = sparringSessionProposalService;
         }
 
         public async Task<IActionResult> IndexAsync()
@@ -47,17 +49,31 @@ namespace CombatLink.Web.Controllers
         public async Task<IActionResult> ChatAsync(int matchId)
         {
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            List<ChatMessage> messages = (List<ChatMessage>)await _chatMessageService.GetMessagesForMatchId(matchId);
+            var match = await _matchService.GetMatchById(matchId);
+            if (match == null) return NotFound();
+            int otherUserId = match.User1Id == userId ? match.User2Id : match.User1Id;
+
+            var messages = (await _chatMessageService.GetMessagesForMatchId(matchId)).ToList();
+            var proposals = (await _sparringSessionProposalService.GetByTwoUserIdsAsync(userId, otherUserId)).ToList();
+
+            var chatItems = new List<ChatItem>();
+
+            chatItems.AddRange(messages.Select(m => new ChatItem{Message = m,Time = m.TimeSent}));
+            chatItems.AddRange(proposals.Select(p => new ChatItem{Proposal = p,Time = p.TimeProposed}));
+            chatItems = chatItems.OrderBy(i => i.Time).ToList();
 
             var model = new ChatViewModel
             {
                 MatchId = matchId,
-                UserId = userId,
-                Messages = messages
+                CurrentUserId = userId,
+                OtherUserId = otherUserId,
+                ChatItems = chatItems,
+                OtherUserObj = await _userService.GetUserById(otherUserId)
             };
 
             return View(model);
         }
+
 
 
         public async Task<IActionResult> MatchesAndChats()

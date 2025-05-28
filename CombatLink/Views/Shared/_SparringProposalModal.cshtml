@@ -1,0 +1,41 @@
+﻿@model CombatLink.Application.ViewModels.ChatViewModel
+
+<div class="modal fade" id="proposeModal" tabindex="-1" aria-labelledby="proposeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="proposeForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="proposeModalLabel">Propose Sparring Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <input type="hidden" id="challengerUserId" value="@Model.CurrentUserId" />
+                <input type="hidden" id="challengedUserId" value="@Model.OtherUserId" />
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="sportId" class="form-label">Sport ID</label>
+                        <input type="number" class="form-control" id="sportId" name="sportId" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="sessionTime" class="form-label">Time of Session</label>
+                        <input type="datetime-local" class="form-control" id="sessionTime" name="sessionTime" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Location</label>
+                        <div id="map" style="height: 300px;"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="latitude" class="form-label">Latitude</label>
+                        <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="longitude" class="form-label">Longitude</label>
+                        <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Send Proposal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

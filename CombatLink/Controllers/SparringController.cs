@@ -16,7 +16,7 @@ namespace CombatLink.Web.Controllers
             _sparringService = sparringService;
         }
 
-        [HttpPost("propose")]
+        [HttpPost]
         public async Task<IActionResult> Propose([FromBody] SparringProposalViewModel model)
         {
             if (!ModelState.IsValid)
@@ -37,10 +37,12 @@ namespace CombatLink.Web.Controllers
             try
             {
                 var success = await _sparringService.AddAsync(proposal);
+                Console.WriteLine("here");
                 return success ? Ok("Proposal sent.") : StatusCode(500, "Failed to send proposal.");
             }
             catch (Exception ex)
             {
+                Console.WriteLine("here");
                 return BadRequest(ex.Message);
             }
         }
