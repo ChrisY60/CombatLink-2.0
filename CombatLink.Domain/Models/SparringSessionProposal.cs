@@ -16,7 +16,7 @@ namespace CombatLink.Domain.Models
         public decimal Longtitude { get; set; }
         public decimal Latitude { get; set; }
         public DateTime TimeOfSession { get; set; }
-        public bool IsAccepted { get; set; }
+        public ProposalStatus Status { get; set; }
 
         public User ChallengerUser = new();
         public User ChallengedUser = new();

@@ -1,6 +1,9 @@
 ﻿using CombatLink.Domain.IRepositories;
 using CombatLink.Domain.Models;
 using Microsoft.Data.SqlClient;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace CombatLink.Infrastructure.Repositories
 {
     public class SparringSessionProposalRepository : ISparringSessionProposalRepository
@@ -16,9 +19,9 @@ namespace CombatLink.Infrastructure.Repositories
         {
             const string query = @"
                 INSERT INTO SparringSessionProposals 
-                (ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, IsAccepted)
+                (ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, Status)
                 VALUES 
-                (@ChallengerUserId, @ChallengedUserId, @TimeProposed, @SportId, @Longitude, @Latitude, @TimeOfSession, @IsAccepted)";
+                (@ChallengerUserId, @ChallengedUserId, @TimeProposed, @SportId, @Longitude, @Latitude, @TimeOfSession, @Status)";
 
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
@@ -31,7 +34,7 @@ namespace CombatLink.Infrastructure.Repositories
             command.Parameters.AddWithValue("@Longitude", proposal.Longtitude);
             command.Parameters.AddWithValue("@Latitude", proposal.Latitude);
             command.Parameters.AddWithValue("@TimeOfSession", proposal.TimeOfSession);
-            command.Parameters.AddWithValue("@IsAccepted", proposal.IsAccepted);
+            command.Parameters.AddWithValue("@Status", (int)proposal.Status);
 
             return await command.ExecuteNonQueryAsync() > 0;
         }
@@ -39,7 +42,7 @@ namespace CombatLink.Infrastructure.Repositories
         public async Task<SparringSessionProposal?> GetByIdAsync(int id)
         {
             const string query = @"
-                SELECT Id, ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, IsAccepted
+                SELECT Id, ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, Status
                 FROM SparringSessionProposals
                 WHERE Id = @Id";
 
@@ -62,7 +65,7 @@ namespace CombatLink.Infrastructure.Repositories
                     Longtitude = reader.GetDecimal(5),
                     Latitude = reader.GetDecimal(6),
                     TimeOfSession = reader.GetDateTime(7),
-                    IsAccepted = reader.GetBoolean(8)
+                    Status = (ProposalStatus)reader.GetInt32(8)
                 };
             }
 
@@ -80,7 +83,7 @@ namespace CombatLink.Infrastructure.Repositories
                     Longitude = @Longitude,
                     Latitude = @Latitude,
                     TimeOfSession = @TimeOfSession,
-                    IsAccepted = @IsAccepted
+                    Status = @Status
                 WHERE Id = @Id";
 
             using var connection = new SqlConnection(_connectionString);
@@ -95,7 +98,7 @@ namespace CombatLink.Infrastructure.Repositories
             command.Parameters.AddWithValue("@Longitude", proposal.Longtitude);
             command.Parameters.AddWithValue("@Latitude", proposal.Latitude);
             command.Parameters.AddWithValue("@TimeOfSession", proposal.TimeOfSession);
-            command.Parameters.AddWithValue("@IsAccepted", proposal.IsAccepted);
+            command.Parameters.AddWithValue("@Status", (int)proposal.Status);
 
             return await command.ExecuteNonQueryAsync() > 0;
         }
@@ -118,7 +121,7 @@ namespace CombatLink.Infrastructure.Repositories
             var proposals = new List<SparringSessionProposal>();
 
             const string query = @"
-                SELECT Id, ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, IsAccepted
+                SELECT Id, ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, Status
                 FROM SparringSessionProposals
                 WHERE ChallengerUserId = @UserId OR ChallengedUserId = @UserId
                 ORDER BY TimeProposed DESC";
@@ -142,7 +145,7 @@ namespace CombatLink.Infrastructure.Repositories
                     Longtitude = reader.GetDecimal(5),
                     Latitude = reader.GetDecimal(6),
                     TimeOfSession = reader.GetDateTime(7),
-                    IsAccepted = reader.GetBoolean(8)
+                    Status = (ProposalStatus)reader.GetInt32(8)
                 });
             }
 
@@ -154,7 +157,7 @@ namespace CombatLink.Infrastructure.Repositories
             var proposals = new List<SparringSessionProposal>();
 
             const string query = @"
-                SELECT Id, ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, IsAccepted
+                SELECT Id, ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, Status
                 FROM SparringSessionProposals
                 WHERE 
                     (ChallengerUserId = @UserId1 AND ChallengedUserId = @UserId2)
@@ -182,12 +185,11 @@ namespace CombatLink.Infrastructure.Repositories
                     Longtitude = reader.GetDecimal(5),
                     Latitude = reader.GetDecimal(6),
                     TimeOfSession = reader.GetDateTime(7),
-                    IsAccepted = reader.GetBoolean(8)
+                    Status = (ProposalStatus)reader.GetInt32(8)
                 });
             }
 
             return proposals;
         }
-
     }
 }

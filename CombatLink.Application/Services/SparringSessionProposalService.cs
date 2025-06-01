@@ -20,6 +20,8 @@ namespace CombatLink.Application.Services
 
         public async Task<bool> AddAsync(SparringSessionProposal proposal)
         {
+            // Set default status to Pending when adding a new proposal
+            proposal.Status = ProposalStatus.Pending;
             return await _repository.AddAsync(proposal);
         }
 
@@ -50,22 +52,6 @@ namespace CombatLink.Application.Services
             return proposals;
         }
 
-        public async Task<bool> UpdateAsync(SparringSessionProposal proposal)
-        {
-            var success = await _repository.UpdateAsync(proposal);
-            if (!success) return false;
-
-            // Enrich after update if needed
-            var sport = await _sportService.GetSportByIdAsync(proposal.SportId);
-            proposal.RelatedSport = sport;
-            return true;
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            return await _repository.DeleteAsync(id);
-        }
-
         public async Task<IEnumerable<SparringSessionProposal>> GetByTwoUserIdsAsync(int user1Id, int user2Id)
         {
             var proposals = (await _repository.GetByTwoUserIdsAsync(user1Id, user2Id)).ToList();
@@ -82,5 +68,20 @@ namespace CombatLink.Application.Services
             return proposals;
         }
 
+        public async Task<bool> UpdateAsync(SparringSessionProposal proposal)
+        {
+            var success = await _repository.UpdateAsync(proposal);
+            if (!success) return false;
+
+            // Enrich after update if needed
+            var sport = await _sportService.GetSportByIdAsync(proposal.SportId);
+            proposal.RelatedSport = sport;
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            return await _repository.DeleteAsync(id);
+        }
     }
 }

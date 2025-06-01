@@ -3,6 +3,7 @@ using CombatLink.Domain.IServices;
 using CombatLink.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace CombatLink.Web.Controllers
 {
@@ -31,21 +32,18 @@ namespace CombatLink.Web.Controllers
                 TimeOfSession = model.TimeOfSession,
                 Longtitude = model.Longitude,
                 Latitude = model.Latitude,
-                IsAccepted = false
+                Status = ProposalStatus.Pending
             };
 
             try
             {
                 var success = await _sparringService.AddAsync(proposal);
-                Console.WriteLine("here");
                 return success ? Ok("Proposal sent.") : StatusCode(500, "Failed to send proposal.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("here");
                 return BadRequest(ex.Message);
             }
         }
     }
-
 }
