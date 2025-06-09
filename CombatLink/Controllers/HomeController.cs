@@ -51,6 +51,10 @@ namespace CombatLink.Web.Controllers
             int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var match = await _matchService.GetMatchById(matchId);
             if (match == null) return NotFound();
+
+            if (match.User1Id != userId && match.User2Id != userId)
+                return StatusCode(403, "You are not authorized to access this chat.");
+
             int otherUserId = match.User1Id == userId ? match.User2Id : match.User1Id;
 
             var messages = (await _chatMessageService.GetMessagesForMatchId(matchId)).ToList();

@@ -1,0 +1,63 @@
+﻿@model CombatLink.Domain.Models.SparringSessionProposal
+
+@{
+    var currentUserId = (int?)ViewData["CurrentUserId"] ?? 0;
+    var isChallengedUser = currentUserId == Model.ChallengedUserId;
+    Console.WriteLine("THe user: " + currentUserId + " is " + isChallengedUser);
+}
+
+<div class="modal fade" id="proposalPreviewModal" tabindex="-1" aria-labelledby="proposalPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-body p-0">
+                <!-- Map -->
+                <div id="map" style="height: 300px;"
+                     data-lat="@Model.Latitude"
+                     data-lng="@Model.Longtitude">
+                </div>
+
+                <!-- Profiles -->
+                <div class="text-center my-3">
+                    <img src="@Model.ChallengerUser.ProfilePictureURL" class="rounded-circle mx-2" width="80" height="80" />
+                    <img src="/images/vs.png" class="mx-2" style="height: 40px;" />
+                    <img src="@Model.ChallengedUser.ProfilePictureURL" class="rounded-circle mx-2" width="80" height="80" />
+                </div>
+
+                <!-- Info -->
+                <div class="text-center">
+                    <h5>@Model.ChallengerUser.FirstName @Model.ChallengerUser.LastName wants to spar you!</h5>
+                    <p class="mb-1">Date: <strong>@Model.TimeOfSession.ToString("dd.MM.yyyy")</strong></p>
+                    <p class="mb-1">Time: <strong>@Model.TimeOfSession.ToString("HH:mm")</strong></p>
+                    <p class="mb-2">
+                        Sport:
+                        <span class="badge border border-danger text-danger px-3 py-2 fs-6 rounded-pill">
+                            @(string.IsNullOrWhiteSpace(Model.RelatedSport?.Name) ? "Unknown" : Model.RelatedSport.Name)
+                        </span>
+                    </p>
+                </div>
+                @{
+                    Console.WriteLine("SLEDVASHITE 2: ");
+                    Console.WriteLine("ID: " + currentUserId);
+                    Console.WriteLine("Is challenged user: " + isChallengedUser);
+                }
+                @if (isChallengedUser)
+                {
+                    <div class="d-flex justify-content-around my-4 px-4">
+                        <button class="btn btn-danger px-4 py-2 rounded-pill"
+                                id="declineProposalBtn"
+                                data-action="decline"
+                                data-proposal-id="@Model.Id">
+                            Decline
+                        </button>
+                        <button class="btn btn-success px-4 py-2 rounded-pill"
+                                id="acceptProposalBtn"
+                                data-action="accept"
+                                data-proposal-id="@Model.Id">
+                            Accept
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

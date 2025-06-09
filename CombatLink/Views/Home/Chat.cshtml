@@ -10,6 +10,8 @@
 <script type="module" src="~/js/ChatClient.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <script>
     const matchId = @Model.MatchId;
@@ -20,7 +22,7 @@
     <div class="chat-header">
         <button id="backButton">←</button>
         <div class="user-info">
-            <img src="/images/fighter1.png" alt="Avatar" class="avatar" />
+            <img src="@Model.OtherUserObj.ProfilePictureURL" alt="Avatar" class="avatar" />
         </div>
     </div>
 
@@ -46,41 +48,79 @@
                 </div>
             }
 
-            if (item.Proposal != null)
+            @if (item.Proposal != null)
             {
-                <div class="proposal-card hover-card">
-                    <div class="map-preview" id="map-@item.Proposal.Id"
-                         data-lat="@item.Proposal.Latitude"
-                         data-lng="@item.Proposal.Longtitude">
-                    </div>
-                    <div class="p-3">
-                        <div><strong>Date:</strong> @item.Proposal.TimeOfSession.ToString("dd.MM.yyyy")</div>
-                        <div><strong>Time:</strong> @item.Proposal.TimeOfSession.ToString("HH:mm")</div>
-                        <span class="badge bg-danger mt-2">
-                            @(string.IsNullOrWhiteSpace(item.Proposal.RelatedSport?.Name) ? "Unknown" : item.Proposal.RelatedSport.Name)
-                        </span>
-                        <div class="text-muted small mt-2 text-center">Click to view more information</div>
-                    </div>
-                    <div class="hover-overlay">
-                        <span>Click for more information</span>
+                var proposal = item.Proposal;
+
+                // Sent/received logic based on who created the proposal
+                Console.WriteLine(Model.CurrentUserId);
+                var isMine = proposal.ChallengerUserId == Model.CurrentUserId;
+                var alignClass = isMine ? "sent" : "received";
+
+                var statusClass = proposal.Status switch
+                {
+                    ProposalStatus.Accepted => "accepted",
+                    ProposalStatus.Declined => "declined",
+                    _ => "pending"
+                };
+
+                var statusLabel = proposal.Status switch
+                {
+                    ProposalStatus.Accepted => "SPARRING ACCEPTED",
+                    ProposalStatus.Declined => "SPARRING DECLINED",
+                    _ => null
+                };
+
+                <div class="proposal-wrapper @alignClass">
+                    <div class="proposal-card @statusClass hover-card" onclick="showProposalDetails(@proposal.Id)">
+                        @if (statusLabel != null)
+                        {
+                            <div class="overlay-status">@statusLabel</div>
+                        }
+
+                        <div class="map-preview" id="map-@proposal.Id"
+                             data-lat="@proposal.Latitude"
+                             data-lng="@proposal.Longtitude">
+                        </div>
+
+                        <div class="p-3">
+                            <div><strong>Date:</strong> @proposal.TimeOfSession.ToString("dd.MM.yyyy")</div>
+                            <div><strong>Time:</strong> @proposal.TimeOfSession.ToString("HH:mm")</div>
+                            <span class="badge bg-danger mt-2">
+                                @(string.IsNullOrWhiteSpace(proposal.RelatedSport?.Name) ? "Unknown" : proposal.RelatedSport.Name)
+                            </span>
+                            <div class="text-muted small mt-2 text-center">Click to view more information</div>
+                        </div>
+
+                        <div class="hover-overlay">
+                            <span>Click for more information</span>
+                        </div>
+
+                        @await Html.PartialAsync("_SparringProposalDetails", proposal, new ViewDataDictionary(ViewData)
+                        {
+                        { "CurrentUserId", Model.CurrentUserId }
+                        })
+
                     </div>
                 </div>
             }
+
         }
     </div>
 </div>
-    <div class="chat-input">
-        <input type="text" id="messageInput" placeholder="Type here..." />
-        <button class="propose-button" data-bs-toggle="modal" data-bs-target="#proposeModal">
-            <img src="https://combatlinkblob2.blob.core.windows.net/combatlink/propose_spar.webp" alt="Propose" class="propose-icon" />
-        </button>
-        <button class="chatButton" id="sendButton">➤</button>
-    </div>
 
+
+<div class="chat-input">
+    <input type="text" id="messageInput" placeholder="Type here..." />
+    <button class="propose-button" data-bs-toggle="modal" data-bs-target="#proposeModal">
+        <img src="https://combatlinkblob2.blob.core.windows.net/combatlink/propose_spar.webp" alt="Propose" class="propose-icon" />
+    </button>
+    <button class="chatButton" id="sendButton">➔</button>
+</div>
 
 @await Html.PartialAsync("~/Views/Shared/_SparringProposalModal.cshtml", Model)
 
-<!-- JS to Init Proposal Map Previews -->
+
 <script>
     function initializeMapPreview(el) {
         const lat = parseFloat(el.dataset.lat);
@@ -106,31 +146,62 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        // Ensure rendering happens after layout
         setTimeout(() => {
             document.querySelectorAll('.map-preview').forEach(initializeMapPreview);
         }, 300);
     });
 </script>
 
-
-<!-- Modal Map Setup -->
 <script>
     let map, marker;
-
     $(document).ready(function () {
         $('#proposeModal').on('shown.bs.modal', function () {
             if (!map) {
-                map = L.map('map').setView([52.3676, 4.9041], 13);
-
+                map = L.map('proposalMap').setView([52.3676, 4.9041], 13);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 19,
                     attribution: '&copy; OpenStreetMap'
                 }).addTo(map);
 
                 marker = L.marker([52.3676, 4.9041], { draggable: true }).addTo(map);
-
                 marker.on('dragend', function (e) {
+                    const pos = marker.getLatLng();
+                    $('#latitude').val(pos.lat.toFixed(6));
+                    $('#longitude').val(pos.lng.toFixed(6));
+                });
+            }
+            setTimeout(() => map.invalidateSize(), 500);
+        });
+    });
+</script>
+
+<script>
+    let map, marker;
+    $(document).ready(function () {
+        $('#proposeModal').on('shown.bs.modal', function () {
+            if (!map) {
+                map = L.map('proposalMap').setView([52.3676, 4.9041], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                L.Control.geocoder({
+                    defaultMarkGeocode: false
+                })
+                    .on('markgeocode', function (e) {
+                        const center = e.geocode.center;
+                        map.setView(center, 15);
+
+                        marker.setLatLng(center);
+                        $('#latitude').val(center.lat.toFixed(6));
+                        $('#longitude').val(center.lng.toFixed(6));
+                    })
+                    .addTo(map);
+
+                marker = L.marker([52.3676, 4.9041], { draggable: true }).addTo(map);
+                marker.on('dragend', function () {
                     const pos = marker.getLatLng();
                     $('#latitude').val(pos.lat.toFixed(6));
                     $('#longitude').val(pos.lng.toFixed(6));
@@ -142,7 +213,46 @@
     });
 </script>
 
-<!-- Proposal Submit -->
+<script>
+    async function showProposalDetails(proposalId) {
+        try {
+            const response = await fetch(`/Sparring/Details/${proposalId}`);
+            const html = await response.text();
+            const container = document.createElement("div");
+            container.innerHTML = html;
+            document.body.appendChild(container);
+
+            const modalElement = container.querySelector(".modal");
+            const modal = new bootstrap.Modal(modalElement);
+
+            modal.show();
+
+            modalElement.addEventListener('shown.bs.modal', function () {
+                const lat = parseFloat(modalElement.querySelector('[data-lat]').dataset.lat);
+                const lng = parseFloat(modalElement.querySelector('[data-lng]').dataset.lng);
+
+                const mapEl = modalElement.querySelector('#map');
+                const map = L.map(mapEl).setView([lat, lng], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 18,
+                }).addTo(map);
+                L.marker([lat, lng]).addTo(map);
+
+                setTimeout(() => map.invalidateSize(), 300);
+            });
+        } catch (err) {
+            console.error("Failed to load proposal details:", err);
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chatBox = document.getElementById("chatBox");
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+</script>
+
 <script>
     document.getElementById('proposeForm').addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -164,9 +274,9 @@
             });
 
             if (response.ok) {
-                alert("Sparring proposal sent!");
                 $('#proposeModal').modal('hide');
                 document.getElementById('proposeForm').reset();
+                location.reload();
             } else {
                 const error = await response.text();
                 alert("Error: " + error);
@@ -175,11 +285,35 @@
             alert("Unexpected error: " + err);
         }
     });
-</script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const chatBox = document.getElementById("chatBox");
-            chatBox.scrollTop = chatBox.scrollHeight;
-        });
-    </script>
+</script>
+<script>
+    document.addEventListener("click", async function (e) {
+        if (e.target.matches("#acceptProposalBtn, #declineProposalBtn")) {
+            const button = e.target;
+            const action = button.getAttribute("data-action");
+            const proposalId = button.getAttribute("data-proposal-id");
+
+            try {
+                const response = await fetch(`/Sparring/${action}/${proposalId}`, {
+                    method: "POST"
+                });
+
+                if (response.ok) {
+                    console.log(`Proposal ${action.toLowerCase()}ed successfully.`);
+
+                    const modalEl = document.getElementById("proposalPreviewModal");
+                    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    modal.hide();
+
+                    location.reload();
+                } else {
+                    alert("Error: " + await response.text());
+                }
+            } catch (err) {
+                alert("Unexpected error: " + err);
+            }
+        }
+    });
+
+</script>

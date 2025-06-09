@@ -12,5 +12,8 @@ namespace CombatLink.Domain.IServices
         Task<IEnumerable<SparringSessionProposal>> GetByTwoUserIdsAsync(int user1Id, int user2Id);
         Task<bool> UpdateAsync(SparringSessionProposal proposal);
         Task<bool> DeleteAsync(int id);
+        Task<bool> AcceptProposalAsync(int proposalId);
+        Task<bool> DeclineProposalAsync(int proposalId);
+
     }
 }

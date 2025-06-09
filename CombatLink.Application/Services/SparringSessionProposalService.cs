@@ -11,16 +11,17 @@ namespace CombatLink.Application.Services
     {
         private readonly ISparringSessionProposalRepository _repository;
         private readonly ISportService _sportService;
+        private readonly IUserService _userService;
 
-        public SparringSessionProposalService(ISparringSessionProposalRepository repository, ISportService sportService)
+        public SparringSessionProposalService(ISparringSessionProposalRepository repository, ISportService sportService, IUserService userService)
         {
             _repository = repository;
             _sportService = sportService;
+            _userService = userService;
         }
 
         public async Task<bool> AddAsync(SparringSessionProposal proposal)
         {
-            // Set default status to Pending when adding a new proposal
             proposal.Status = ProposalStatus.Pending;
             return await _repository.AddAsync(proposal);
         }
@@ -33,6 +34,9 @@ namespace CombatLink.Application.Services
 
             var sport = await _sportService.GetSportByIdAsync(proposal.SportId);
             proposal.RelatedSport = sport;
+            proposal.ChallengerUser = await _userService.GetUserById(proposal.ChallengerUserId);
+            proposal.ChallengedUser = await _userService.GetUserById(proposal.ChallengedUserId);
+
             return proposal;
         }
 
@@ -46,6 +50,9 @@ namespace CombatLink.Application.Services
                 if (allSports.TryGetValue(proposal.SportId, out var sport))
                 {
                     proposal.RelatedSport = sport;
+                    proposal.ChallengerUser = await _userService.GetUserById(proposal.ChallengerUserId);
+                    proposal.ChallengedUser = await _userService.GetUserById(proposal.ChallengedUserId);
+
                 }
             }
 
@@ -62,6 +69,8 @@ namespace CombatLink.Application.Services
                 if (allSports.TryGetValue(proposal.SportId, out var sport))
                 {
                     proposal.RelatedSport = sport;
+                    proposal.ChallengerUser = await _userService.GetUserById(proposal.ChallengerUserId);
+                    proposal.ChallengedUser = await _userService.GetUserById(proposal.ChallengedUserId);
                 }
             }
 
@@ -73,9 +82,11 @@ namespace CombatLink.Application.Services
             var success = await _repository.UpdateAsync(proposal);
             if (!success) return false;
 
-            // Enrich after update if needed
             var sport = await _sportService.GetSportByIdAsync(proposal.SportId);
             proposal.RelatedSport = sport;
+            proposal.ChallengerUser = await _userService.GetUserById(proposal.ChallengerUserId);
+            proposal.ChallengedUser = await _userService.GetUserById(proposal.ChallengedUserId);
+
             return true;
         }
 
@@ -83,5 +94,24 @@ namespace CombatLink.Application.Services
         {
             return await _repository.DeleteAsync(id);
         }
+
+        public async Task<bool> AcceptProposalAsync(int proposalId)
+        {
+            var proposal = await _repository.GetByIdAsync(proposalId);
+            if (proposal == null) return false;
+
+            proposal.Status = ProposalStatus.Accepted;
+            return await _repository.UpdateAsync(proposal);
+        }
+
+        public async Task<bool> DeclineProposalAsync(int proposalId)
+        {
+            var proposal = await _repository.GetByIdAsync(proposalId);
+            if (proposal == null) return false;
+
+            proposal.Status = ProposalStatus.Declined;
+            return await _repository.UpdateAsync(proposal);
+        }
+
     }
 }
