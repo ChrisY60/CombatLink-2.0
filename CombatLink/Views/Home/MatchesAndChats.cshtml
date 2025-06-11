@@ -43,7 +43,7 @@
                     <div class="chat-item">
                         <img src="@(!string.IsNullOrEmpty(chat.User.ProfilePictureURL) ? chat.User.ProfilePictureURL : "https://combatlinkblob.blob.core.windows.net/combatlink/nopfp.jpg")" />
                         <div class="chat-info">
-                            <h4>@chat.User.FirstName @chat.User.LastName</h4>
+                            <h4 style="text-decoration: none; color: black;">@chat.User.FirstName @chat.User.LastName</h4>
                             <p>@chat.LastMessage</p>
                         </div>
                         @if (chat.UnreadCount > 0)
