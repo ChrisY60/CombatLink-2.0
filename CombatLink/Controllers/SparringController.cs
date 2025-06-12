@@ -61,6 +61,22 @@ namespace CombatLink.Web.Controllers
 
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SparringUpcoming()
+        {
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var sessions = await _sparringService.GetUpcomingSparringSessionsForUserId(currentUserId);
+
+            var model = new SparringUpcomingViewModel
+            {
+                CurrentUserId = currentUserId,
+                UpcomingSessions = sessions.ToList()
+            };
+
+            return View(model);
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Accept(int id)
         {

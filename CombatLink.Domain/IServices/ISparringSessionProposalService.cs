@@ -14,6 +14,8 @@ namespace CombatLink.Domain.IServices
         Task<bool> DeleteAsync(int id);
         Task<bool> AcceptProposalAsync(int proposalId);
         Task<bool> DeclineProposalAsync(int proposalId);
+        Task<IEnumerable<SparringSessionProposal>> GetUpcomingSparringSessionsForUserId(int userId);
+        Task<IEnumerable<SparringSessionProposal>> GetCompletedSparringSessionsForUserId(int userId);
 
     }
 }

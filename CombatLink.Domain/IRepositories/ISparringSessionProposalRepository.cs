@@ -13,6 +13,8 @@ namespace CombatLink.Domain.IRepositories
         Task<IEnumerable<SparringSessionProposal>> GetByUserIdAsync(int userId);
         Task<SparringSessionProposal?> GetByIdAsync(int id);
         Task<IEnumerable<SparringSessionProposal>> GetByTwoUserIdsAsync(int userId1, int userId2);
+        Task<IEnumerable<SparringSessionProposal>> GetUpcommingSparringsForUserId(int userId);
+        Task<IEnumerable<SparringSessionProposal>> GetCompletedSparringSessionsForUserId(int userId);
         Task<bool> UpdateAsync(SparringSessionProposal proposal);
         Task<bool> DeleteAsync(int id);
 

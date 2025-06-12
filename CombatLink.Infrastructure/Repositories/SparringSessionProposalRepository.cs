@@ -191,5 +191,87 @@ namespace CombatLink.Infrastructure.Repositories
 
             return proposals;
         }
+
+        public async Task<IEnumerable<SparringSessionProposal>> GetUpcommingSparringsForUserId(int userId)
+        {
+            var proposals = new List<SparringSessionProposal>();
+
+            const string query = @"
+        SELECT Id, ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, Status
+        FROM SparringSessionProposals
+        WHERE 
+            (ChallengerUserId = @UserId OR ChallengedUserId = @UserId)
+            AND Status = @AcceptedStatus
+            AND TimeOfSession > GETUTCDATE()
+        ORDER BY TimeOfSession ASC";
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@UserId", userId);
+            command.Parameters.AddWithValue("@AcceptedStatus", (int)ProposalStatus.Accepted);
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                proposals.Add(new SparringSessionProposal
+                {
+                    Id = reader.GetInt32(0),
+                    ChallengerUserId = reader.GetInt32(1),
+                    ChallengedUserId = reader.GetInt32(2),
+                    TimeProposed = reader.GetDateTime(3),
+                    SportId = reader.GetInt32(4),
+                    Longtitude = reader.GetDecimal(5),
+                    Latitude = reader.GetDecimal(6),
+                    TimeOfSession = reader.GetDateTime(7),
+                    Status = (ProposalStatus)reader.GetInt32(8)
+                });
+            }
+
+            return proposals;
+        }
+
+        public async Task<IEnumerable<SparringSessionProposal>> GetCompletedSparringSessionsForUserId(int userId)
+        {
+            var proposals = new List<SparringSessionProposal>();
+
+            const string query = @"
+        SELECT Id, ChallengerUserId, ChallengedUserId, TimeProposed, SportId, Longitude, Latitude, TimeOfSession, Status
+        FROM SparringSessionProposals
+        WHERE 
+            (ChallengerUserId = @UserId OR ChallengedUserId = @UserId)
+            AND Status = @AcceptedStatus
+            AND TimeOfSession <= GETUTCDATE()
+        ORDER BY TimeOfSession DESC";
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@UserId", userId);
+            command.Parameters.AddWithValue("@AcceptedStatus", (int)ProposalStatus.Accepted);
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                proposals.Add(new SparringSessionProposal
+                {
+                    Id = reader.GetInt32(0),
+                    ChallengerUserId = reader.GetInt32(1),
+                    ChallengedUserId = reader.GetInt32(2),
+                    TimeProposed = reader.GetDateTime(3),
+                    SportId = reader.GetInt32(4),
+                    Longtitude = reader.GetDecimal(5),
+                    Latitude = reader.GetDecimal(6),
+                    TimeOfSession = reader.GetDateTime(7),
+                    Status = (ProposalStatus)reader.GetInt32(8)
+                });
+            }
+
+            return proposals;
+        }
+
+
     }
 }

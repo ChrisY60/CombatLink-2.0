@@ -1,0 +1,53 @@
+﻿@model CombatLink.Application.ViewModels.SparringUpcomingViewModel
+@{
+    ViewData["Title"] = "Upcoming Sparring Sessions";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4 text-white">Upcoming Sparring Sessions</h2>
+
+
+    @if (!Model.UpcomingSessions.Any())
+    {
+        <div class="alert alert-info text-center">
+            No upcoming sessions found. Accept a proposal to schedule sparring!
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            @foreach (var session in Model.UpcomingSessions)
+            {
+                var partner = session.ChallengerUserId == Model.CurrentUserId ? session.ChallengedUser : session.ChallengerUser;
+                var title = session.RelatedSport?.Name ?? "Sparring Session";
+                var startTime = session.TimeOfSession;
+                var endTime = startTime.AddHours(1); // assuming 1-hour spar
+
+                var googleCalendarUrl = $"https://www.google.com/calendar/render?action=TEMPLATE" +
+                $"&text={Uri.EscapeDataString("Sparring - " + title)}" +
+                $"&dates={startTime:yyyyMMddTHHmmssZ}/{endTime:yyyyMMddTHHmmssZ}" +
+                $"&details={Uri.EscapeDataString($"Sparring with {partner.FirstName} {partner.LastName}")}" +
+                $"&location={session.Latitude},{session.Longtitude}" +
+                $"&sf=true&output=xml";
+
+                <div class="col">
+                    <div class="card shadow-sm rounded-4 border-0">
+                        <div class="card-body">
+                            <h5 class="card-title">@title</h5>
+                            <p class="card-text mb-1"><strong>Date:</strong> @session.TimeOfSession.ToString("dd MMM yyyy")</p>
+                            <p class="card-text mb-1"><strong>Time:</strong> @session.TimeOfSession.ToString("HH:mm")</p>
+                            <p class="card-text mb-1"><strong>Partner:</strong> @partner.FirstName @partner.LastName</p>
+                            <p class="card-text mb-3"><strong>Location:</strong> @session.Latitude, @session.Longtitude</p>
+
+                            <a class="btn btn-outline-success w-100" href="@googleCalendarUrl" target="_blank">
+                                Add to Google Calendar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />

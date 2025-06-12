@@ -112,6 +112,41 @@ namespace CombatLink.Application.Services
             proposal.Status = ProposalStatus.Declined;
             return await _repository.UpdateAsync(proposal);
         }
+        public async Task<IEnumerable<SparringSessionProposal>> GetUpcomingSparringSessionsForUserId(int userId)
+        {
+            var proposals = (await _repository.GetUpcommingSparringsForUserId(userId)).ToList();
+            var allSports = (await _sportService.GetAllSportsAsync()).ToDictionary(s => s.Id);
+
+            foreach (var proposal in proposals)
+            {
+                if (allSports.TryGetValue(proposal.SportId, out var sport))
+                {
+                    proposal.RelatedSport = sport;
+                }
+                proposal.ChallengerUser = await _userService.GetUserById(proposal.ChallengerUserId);
+                proposal.ChallengedUser = await _userService.GetUserById(proposal.ChallengedUserId);
+            }
+
+            return proposals;
+        }
+
+        public async Task<IEnumerable<SparringSessionProposal>> GetCompletedSparringSessionsForUserId(int userId)
+        {
+            var proposals = (await _repository.GetCompletedSparringSessionsForUserId(userId)).ToList();
+            var allSports = (await _sportService.GetAllSportsAsync()).ToDictionary(s => s.Id);
+
+            foreach (var proposal in proposals)
+            {
+                if (allSports.TryGetValue(proposal.SportId, out var sport))
+                {
+                    proposal.RelatedSport = sport;
+                }
+                proposal.ChallengerUser = await _userService.GetUserById(proposal.ChallengerUserId);
+                proposal.ChallengedUser = await _userService.GetUserById(proposal.ChallengedUserId);
+            }
+
+            return proposals;
+        }
 
     }
 }
