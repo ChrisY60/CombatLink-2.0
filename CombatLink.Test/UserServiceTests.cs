@@ -23,15 +23,29 @@ namespace CombatLink.Tests.Services
         }
 
         [Fact]
-        public async Task RegisterUserAsync_ShouldReturnTrue_WhenUserRegistered()
+        public async Task RegisterUserAsync_ShouldReturnTrue_AndCaptureEmailAndHashedPassword()
         {
+            string? capturedEmail = null;
+            string? capturedPasswordHash = null;
+
             _passwordHasherMock.Setup(x => x.HashPassword(null, "password")).Returns("hashedPassword");
-            _userRepoMock.Setup(x => x.RegisterUserAsync("test@example.com", "hashedPassword")).ReturnsAsync(true);
+
+            _userRepoMock
+                .Setup(x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string>((email, passwordHash) =>
+                {
+                    capturedEmail = email;
+                    capturedPasswordHash = passwordHash;
+                })
+                .ReturnsAsync(true);
 
             var result = await _userService.RegisterUserAsync("test@example.com", "password");
 
             Assert.True(result);
+            Assert.Equal("test@example.com", capturedEmail);
+            Assert.Equal("hashedPassword", capturedPasswordHash);
         }
+
 
         [Fact]
         public async Task LogInUserAsync_ShouldReturnUserId_WhenCredentialsAreValid()
@@ -162,6 +176,55 @@ namespace CombatLink.Tests.Services
             Assert.Contains("Experience", ex.Message);
         }
 
+        [Fact]
+        public async Task UpdateUserProfile_ShouldReturnTrue_AndCaptureValues()
+        {
+            int? capturedId = null;
+            string? capturedFirst = null;
+            string? capturedLast = null;
+            DateTime? capturedDob = null;
+            decimal? capturedWeight = null;
+            decimal? capturedHeight = null;
+            int? capturedExperience = null;
+            string? capturedPicUrl = null;
+
+            _userRepoMock
+                .Setup(x => x.UpdateUserProfile(
+                    It.IsAny<int>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<DateTime>(),
+                    It.IsAny<decimal>(),
+                    It.IsAny<decimal>(),
+                    It.IsAny<int>(),
+                    It.IsAny<string?>()))
+                .Callback<int, string, string, DateTime, decimal, decimal, int, string?>(
+                    (id, first, last, dob, w, h, exp, pic) =>
+                    {
+                        capturedId = id;
+                        capturedFirst = first;
+                        capturedLast = last;
+                        capturedDob = dob;
+                        capturedWeight = w;
+                        capturedHeight = h;
+                        capturedExperience = exp;
+                        capturedPicUrl = pic;
+                    })
+                .ReturnsAsync(true);
+
+            var dob = new DateTime(2000, 1, 1);
+            var result = await _userService.UpdateUserProfile(1, "John", "Doe", dob, 80, 180, 10, "pic.jpg");
+
+            Assert.True(result);
+            Assert.Equal(1, capturedId);
+            Assert.Equal("John", capturedFirst);
+            Assert.Equal("Doe", capturedLast);
+            Assert.Equal(dob, capturedDob);
+            Assert.Equal(80, capturedWeight);
+            Assert.Equal(180, capturedHeight);
+            Assert.Equal(10, capturedExperience);
+            Assert.Equal("pic.jpg", capturedPicUrl);
+        }
 
         [Fact]
         public async Task GetUserById_ShouldReturnUser_WhenExists()

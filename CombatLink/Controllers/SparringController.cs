@@ -67,7 +67,7 @@ namespace CombatLink.Web.Controllers
             int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var sessions = await _sparringService.GetUpcomingSparringSessionsForUserId(currentUserId);
 
-            var model = new SparringUpcomingViewModel
+            var model = new SparringsViewModel
             {
                 CurrentUserId = currentUserId,
                 UpcomingSessions = sessions.ToList()
@@ -76,6 +76,20 @@ namespace CombatLink.Web.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SparringHistory()
+        {
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var sessions = await _sparringService.GetCompletedSparringSessionsForUserId(currentUserId);
+
+            var model = new SparringsViewModel
+            {
+                CurrentUserId = currentUserId,
+                UpcomingSessions = sessions.ToList()
+            };
+
+            return View(model);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Accept(int id)

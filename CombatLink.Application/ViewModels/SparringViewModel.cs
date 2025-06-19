@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CombatLink.Application.ViewModels
 {
-    public class SparringUpcomingViewModel
+    public class SparringsViewModel
     {
         public List<SparringSessionProposal> UpcomingSessions = new List<SparringSessionProposal>();
         public int CurrentUserId;
