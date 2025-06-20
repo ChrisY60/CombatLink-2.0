@@ -14,6 +14,7 @@ namespace CombatLink.Application.Services
     {
         private IUserRepository _userRepository;
         IPasswordHasher<object> _passwordHasher;
+
         public UserService(IUserRepository userRepository, IPasswordHasher<object> passwordHasher)
         {
             _userRepository = userRepository;
@@ -33,17 +34,11 @@ namespace CombatLink.Application.Services
             if (result)
             {
                 int? userId = await _userRepository.GetUserIdByEmail(email);
-                if (userId != null)
-                {
-                    return userId;
-                }
-                else
-                {
-                    return null;
-                }
+                return userId;
             }
             return null;
         }
+
         public async Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience, string? profilePictureUrl = null)
         {
             if (string.IsNullOrWhiteSpace(firstName) || firstName.Length > 50)
@@ -67,13 +62,14 @@ namespace CombatLink.Application.Services
             return await _userRepository.UpdateUserProfile(userId, firstName, lastName, dateOfBirth, weight, height, monthsOfExperience, profilePictureUrl);
         }
 
-
         public async Task<User?> GetUserById(int userId)
         {
             return await _userRepository.GetUserById(userId);
         }
 
-
-
+        public async Task<bool> VerifyUserAsync(int userId)
+        {
+            return await _userRepository.SetUserVerifiedAsync(userId, true);
+        }
     }
 }

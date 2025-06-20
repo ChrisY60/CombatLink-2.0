@@ -1,4 +1,5 @@
-﻿using CombatLink.Domain.Models;
+﻿using CombatLink.Domain.IRepositories;
+using CombatLink.Domain.Models;
 
 namespace CombatLink.Domain.IServices
 {
@@ -11,6 +12,10 @@ namespace CombatLink.Domain.IServices
         Task<bool> UpdateUserProfile(int userId, string firstName, string lastName, DateTime dateOfBirth, decimal weight, decimal height, int monthsOfExperience, string? profilePictureUrl = null);
 
         Task<User?> GetUserById(int userId);
+
+        Task<bool> VerifyUserAsync(int userId);
+        
+
     }
 
 }

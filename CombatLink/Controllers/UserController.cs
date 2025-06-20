@@ -108,7 +108,7 @@ namespace CombatLink.Web.Controllers
             List<Language> selectedLanguages = (List<Language>)await _languageService.GetLanguagesByUserIdAsync(userId);
             List<Sport> selectedSports = (List<Sport>)await _sportsService.GetSportsByUserIdAsync(userId);
 
-            var viewModel = new UserProfileViewModel{ProfilePictureURL = user.ProfilePictureURL,AvailableSports = allSports,AvailableLanguages = allLanguages,Form = new UpdateUserProfileManagementViewModel{FirstName = user.FirstName ?? "",LastName = user.LastName ?? "",DateOfBirth = user.DateOfBirth ?? DateTime.Today,Weight = user.Weight ?? 0,Height = user.Height ?? 0,MonthsOfExperience = user.MonthsOfExperience ?? 0,SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList()}};
+            var viewModel = new UserProfileViewModel{ProfilePictureURL = user.ProfilePictureURL,AvailableSports = allSports,AvailableLanguages = allLanguages,Form = new UpdateUserProfileManagementViewModel{FirstName = user.FirstName ?? "",LastName = user.LastName ?? "",DateOfBirth = user.DateOfBirth ?? DateTime.Today,Weight = user.Weight ?? 0,Height = user.Height ?? 0,MonthsOfExperience = user.MonthsOfExperience ?? 0,SelectedSportIds = selectedSports.Select(s => s.Id).ToList(),SelectedLanguageIds = selectedLanguages.Select(l => l.Id).ToList()}, IsAgeVerified = user.IsVerified };
 
             return View(viewModel);
         }

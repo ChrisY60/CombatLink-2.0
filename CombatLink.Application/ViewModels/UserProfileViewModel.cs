@@ -11,5 +11,7 @@ namespace CombatLink.Application.ViewModels
         public List<Language> AvailableLanguages { get; set; } = new();
 
         public UpdateUserProfileManagementViewModel Form { get; set; } = new();
+        public bool IsAgeVerified { get; set; } = false;
+
     }
 }

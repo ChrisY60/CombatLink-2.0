@@ -20,6 +20,8 @@ namespace CombatLink.Domain.IRepositories
         public Task<bool> AddLanguageToUser(Language language, User user);
 
         public Task<bool> RemoveLanguageFromUser(int userId, int languageId);
+        Task<bool> SetUserVerifiedAsync(int userId, bool isVerified);
+
 
     }
 }

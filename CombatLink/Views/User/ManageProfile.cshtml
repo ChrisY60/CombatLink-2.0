@@ -35,6 +35,15 @@
                             <div><i class="fas fa-weight"></i> @Model.Form.Weight Kg</div>
                             <div><i class="fas fa-ruler-vertical"></i> @Model.Form.Height Cm</div>
                         </div>
+                        @if (Model.IsAgeVerified)
+                        {
+                            <p class="text-success font-weight-bold mt-2"><i class="fas fa-check-circle"></i> Age Verified</p>
+                        }
+                        else
+                        {
+                            <p class="text-warning font-weight-bold mt-2"><i class="fas fa-exclamation-triangle"></i> Age Not Verified</p>
+                        }
+
                         <div class="tags">
                             @foreach (var sport in Model.AvailableSports.Take(3))
                             {

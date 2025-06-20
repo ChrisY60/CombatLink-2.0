@@ -12,6 +12,7 @@
         public decimal? Height { get; set; }
         public int? MonthsOfExperience { get; set; }
         public string? ProfilePictureURL { get; set; }
+        public bool IsVerified { get; set; } = false;
         public ICollection<Sport> Sports { get; set; } = new List<Sport>();
         public ICollection<Language> Languages { get; set; } = new List<Language>();
 
